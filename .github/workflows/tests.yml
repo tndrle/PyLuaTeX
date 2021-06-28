@@ -1,0 +1,60 @@
+name: Tests
+env:
+  cache-version: v3
+on: [push]
+jobs:
+  tests:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        include:
+          - os: ubuntu-latest
+            CACHE_DIR: /tmp/texlive
+            BIN_PATH: /tmp/texlive/bin/x86_64-linux
+          - os: macos-latest
+            CACHE_DIR: /tmp/texlive
+            BIN_PATH: /tmp/texlive/bin/universal-darwin
+          - os: windows-latest
+            CACHE_DIR: D:\texlive
+            BIN_PATH: D:\texlive\bin\win32
+    timeout-minutes: 10
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v2
+      - name: Cache environments
+        id: cache-env
+        uses: actions/cache@v1
+        with:
+          path: ${{ matrix.CACHE_DIR }}
+          key: ${{ env.cache-version }}-${{ runner.os }}-env
+          restore-keys: ${{ env.cache-version }}-${{ runner.os }}-env
+      - name: Install TeX Live (Windows)
+        if: ${{ steps.cache-env.outputs.cache-hit != 'true' && runner.os == 'Windows' }}
+        uses: ./.github/actions/texlive-windows
+      - name: Install TeX Live (Unix)
+        if: ${{ steps.cache-env.outputs.cache-hit != 'true' && runner.os != 'Windows' }}
+        uses: ./.github/actions/texlive-unix
+      - name: Set PATH
+        run: echo "${{ matrix.BIN_PATH }}" >> $GITHUB_PATH
+        shell: bash
+      - name: Install dependencies
+        run: |
+          python3 -m pip install --upgrade pip
+          python3 -m pip install pandas
+          tlmgr update --self
+          tlmgr install pgfplots
+      - name: Copy repository to LaTeX package folder
+        run: |
+          mkdir -p ~/texmf/tex/latex/pyluatex
+          cp -r . ~/texmf/tex/latex/pyluatex/
+        shell: bash
+      - name: Run tests
+        run: |
+          cd test
+          python3 run_tests.py
+      - name: Run examples
+        run: |
+          cd example
+          lualatex -shell-escape data-visualization.tex
+          lualatex -shell-escape readme-example.tex
+          lualatex -shell-escape sessions.tex
