@@ -59,7 +59,7 @@ The location of this folder may vary. Typical defaults for TeX Live are `~/texmf
 `~/Library/texmf` for macOS, and `C:\Users\<user name>\texmf` for Windows.
 If you are lucky, the command `kpsewhich -var-value=TEXMFHOME` tells you the location.
 For MiKTeX, the folder can be found and configured in the *MiKTeX Console*.
-2. Download or clone the PyLuaTeX repository
+2. Download the [latest release](https://github.com/tndrle/PyLuaTeX/releases/latest) of PyLuaTeX
 3. Put the downloaded files in the folder `TEXMF/tex/latex/pyluatex` (where `TEXMF` is the folder located in 1.)  
 The final folder structure must be
 ```
