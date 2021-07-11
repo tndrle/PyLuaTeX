@@ -42,11 +42,12 @@ executed. For this reason, it is recommended to compile trusted documents only.
 
 ### Further Examples
 The folder `example` contains additional example documents:
-| File | Description |
-|------|-------------|
-| `readme-example.tex` | The example above |
-| `sessions.tex` | Demonstrates the use of different Python sessions in a document |
-| `data-visualization.tex` | Demonstrates the visualization of data using *pgfplots* and *pandas* |
+* `readme-example.tex`  
+  The example above
+* `sessions.tex`  
+  Demonstrates the use of different Python sessions in a document
+* `data-visualization.tex`  
+  Demonstrates the visualization of data using *pgfplots* and *pandas*
 
 For more intricate use cases have a look at our tests in the folder `test`.
 
@@ -75,23 +76,41 @@ TEXMF/tex/latex/pyluatex/
 PyLuaTeX offers a simple set of options, macros and environments.
 
 ### Package Options
-| Option | Description | Example |
-|--------|-------------|---------|
-| `verbose` | If this option is enabled, Python input and output is written to the log file. | `\usepackage[verbose]{pyluatex}` |
-| `executable` | Specifies the path to the Python executable. (default: `python3`) | `\usepackage[executable=/usr/local/bin/python3]{pyluatex}` |
+* `verbose`  
+  If this option is enabled, Python input and output is written to the log file.  
+  *Example:* `\usepackage[verbose]{pyluatex}`
+* `executable`  
+  Specifies the path to the Python executable. (default: `python3`)  
+  *Example:* `\usepackage[executable=/usr/local/bin/python3]{pyluatex}`
 
 ### Macros
-| Macro | Description | Example |
-|-------|-------------|---------|
-| `\py{code}` | Executes `code` and writes the output to the document. | `\py{3 + 7}` |
-| `\pyc{code}` | Executes `code`. | `\pyc{x = 5}` |
-| `\pyfile{path}` | Executes the Python file specified by `path`. | `\pyfile{main.py}` |
-| `\pysession{session}` | Selects `session` as Python session for subsequent Python code.<br>The session that is active at the beginning is `default`. | `\pysession{main}` |
+* `\py{code}`  
+  Executes `code` and writes the output to the document.  
+  *Example:* `\py{3 + 7}`
+* `\pyc{code}`  
+  Executes `code`  
+  *Example:* `\pyc{x = 5}`
+* `\pyfile{path}`  
+  Executes the Python file specified by `path`.  
+  *Example:* `\pyfile{main.py}`
+* `\pysession{session}`  
+  Selects `session` as Python session for subsequent Python code.  
+  The session that is active at the beginning is `default`.  
+  *Example:* `\pysession{main}`
 
 ### Environments
-| Environment | Description | Example |
-|-------|-------------|---------|
-| `python` | Executes the provided block of Python code.<br>The environment handles characters like `_`, `#`, `%`, `\`, etc.<br>Code on the same line as `\begin{python}` is ignored, i.e., code must start on the next line.<br>If leading spaces are present they are gobbled automatically up to the first level of indentation. | <pre>\begin{python}<br>&nbsp;&nbsp;&nbsp;&nbsp;x = 'Hello PyLuaTeX'<br>&nbsp;&nbsp;&nbsp;&nbsp;print(x)<br>\end{python}</pre> |
+* `python`  
+  Executes the provided block of Python code.  
+  The environment handles characters like `_`, `#`, `%`, `\`, etc.  
+  Code on the same line as `\begin{python}` is ignored, i.e., code must start on the next line.  
+  If leading spaces are present they are gobbled automatically up to the first level of indentation.  
+  *Example:*
+  ```
+  \begin{python}
+      x = 'Hello PyLuaTeX'
+      print(x)
+  \end{python}
+  ```
 
 ## Requirements
 * LuaLaTeX
