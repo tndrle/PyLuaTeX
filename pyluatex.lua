@@ -43,9 +43,10 @@ local function err_cmd(message)
     return "\\PackageError{PyLuaTeX}{" .. message .. "}{}"
 end
 
-function pyluatex.start(executable, os_type)
+function pyluatex.start(executable)
+    local is_windows = package.config:sub(1,1) ~= "/"
     local cmd
-    if os_type == "windows" then
+    if is_windows then
         cmd = "start /B " .. executable .. " \"" .. script .. "\""
     else
         cmd = executable .. " \"" .. script .. "\" &"

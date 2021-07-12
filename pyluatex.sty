@@ -28,9 +28,7 @@
 \DeclareVoidOption{verbose}{\directlua{pyluatex.verbose = true}}
 \ProcessKeyvalOptions*
 
-\ExplSyntaxOn
-\directlua{pyluatex.start([==[\pyluatex@executable]==], "\c_sys_platform_str")}
-\ExplSyntaxOff
+\directlua{pyluatex.start([==[\pyluatex@executable]==])}
 
 \newenvironment{python}{\directlua{pyluatex.record_env()}}{}
 
