@@ -36,6 +36,7 @@ local script = file.join(folder, "pyluatex-interpreter.py")
 local tcp = nil
 
 local python_lines = {}
+local python_output = nil
 
 local env_end = "\\end{python}"
 
@@ -71,33 +72,46 @@ local function request(data)
     return response.success, response.output
 end
 
-local function print_input(code)
+local function log_input(code)
     texio.write_nl("PyLuaTeX input for session \"" .. pyluatex.session .. "\": " .. code)
 end
 
-local function print_output(code)
+local function log_output(code)
     texio.write_nl("PyLuaTeX output: " .. code)
 end
 
+local function print_lines(str)
+    for s in str:gmatch("[^\r\n]+") do
+        tex.sprint(s)
+    end
+end
+
 function pyluatex.execute(code, write)
-    if pyluatex.verbose then print_input(code) end
+    if pyluatex.verbose then log_input(code) end
 
     local success, output = request({ session = pyluatex.session, code = code })
     if success then
-        if pyluatex.verbose then print_output(output) end
+        if pyluatex.verbose then log_output(output) end
         if write then
-            tex.sprint(output)
+            print_lines(output)
         else
             return output
         end
     else
-        if not pyluatex.verbose then print_input(code) end
-        print_output(output)
+        if not pyluatex.verbose then log_input(code) end
+        log_output(output)
         if write then
             tex.sprint(err_cmd("Python error (see above)"))
         end
     end
     return nil
+end
+
+function pyluatex.print_env()
+    if python_output ~= nil then
+        print_lines(python_output)
+        python_output = nil
+    end
 end
 
 local function record_line(line)
@@ -108,7 +122,8 @@ local function record_line(line)
         local code = table.concat(python_lines, "\n")
         local output = pyluatex.execute(code, false)
         if output ~= nil then
-            return output .. line:sub(s)
+            python_output = output
+            return line:sub(s)
         else
             return env_end .. err_cmd("Python error (see above)") .. line:sub(e + 1)
         end
@@ -120,6 +135,7 @@ end
 
 function pyluatex.record_env()
     python_lines = {}
+    python_output = nil
     luatexbase.add_to_callback("process_input_buffer", record_line, "pyluatex_record_line")
 end
 

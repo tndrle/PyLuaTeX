@@ -30,7 +30,8 @@
 
 \directlua{pyluatex.start([==[\pyluatex@executable]==])}
 
-\newenvironment{python}{\directlua{pyluatex.record_env()}}{}
+\newenvironment{python}{\directlua{pyluatex.record_env()}}%
+{\directlua{pyluatex.print_env()}}
 
 \newcommand*{\py}[1]{%
 \directlua{pyluatex.execute([==[print(str(#1), end='')]==], true)}%

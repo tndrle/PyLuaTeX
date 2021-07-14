@@ -94,9 +94,9 @@ table = table_data.to_latex(
     index=False,
     float_format='{:,.0f}'.format,
     header=['Year', 'Total (thousands)', 'Male (thousands)', 'Female (thousands)']
-).replace('\n', ' ')  # Some newlines in the output cause problems
+)
+print(table)
 \end{python}
-\py{table}
 \end{center}
 
 The plot below shows the estimated population of China and the United States
