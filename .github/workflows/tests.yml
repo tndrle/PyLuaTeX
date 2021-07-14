@@ -40,9 +40,9 @@ jobs:
       - name: Install dependencies
         run: |
           python3 -m pip install --upgrade pip
-          python3 -m pip install pandas
+          python3 -m pip install pandas matplotlib
           tlmgr update --self
-          tlmgr install pgfplots
+          tlmgr install pgfplots lualatex-math
       - name: Copy repository to LaTeX package folder
         run: |
           mkdir -p ~/texmf/tex/latex/pyluatex
@@ -55,6 +55,8 @@ jobs:
       - name: Run examples
         run: |
           cd example
-          lualatex -shell-escape data-visualization.tex
-          lualatex -shell-escape readme-example.tex
-          lualatex -shell-escape sessions.tex
+          lualatex -shell-escape --interaction=nonstopmode data-visualization.tex
+          lualatex -shell-escape --interaction=nonstopmode readme-example.tex
+          lualatex -shell-escape --interaction=nonstopmode sessions.tex
+          lualatex -shell-escape --interaction=nonstopmode matplotlib-external.tex
+          lualatex -shell-escape --interaction=nonstopmode matplotlib-pgf.tex
