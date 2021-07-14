@@ -65,8 +65,8 @@ For MiKTeX, the folder can be found and configured in the *MiKTeX Console*.
 The final folder structure must be
 ```
 TEXMF/tex/latex/pyluatex/
-├── interpreter.py
-├── json.lua
+├── pyluatex-interpreter.py
+├── pyluatex-json.lua
 ├── pyluatex.lua
 ├── pyluatex.sty
 ├── ...

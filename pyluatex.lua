@@ -22,7 +22,7 @@ FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
 IN THE SOFTWARE.
 --]]
 
-local json = require("json")
+local json = require("pyluatex-json")
 local socket = require("socket")
 
 pyluatex = pyluatex or {
@@ -32,7 +32,7 @@ pyluatex = pyluatex or {
 
 -- status.filename: path to pyluatex.sty
 local folder = file.pathpart(file.collapsepath(status.filename, true))
-local script = file.join(folder, "interpreter.py")
+local script = file.join(folder, "pyluatex-interpreter.py")
 local tcp = nil
 
 local python_lines = {}

@@ -77,7 +77,7 @@ if is_windows:
     )
 else:
     result = subprocess.run(['pgrep', '-ilf', 'python'], capture_output=True)
-if 'interpreter.py' in result.stdout.decode('utf-8').lower():
+if 'pyluatex-interpreter.py' in result.stdout.decode('utf-8').lower():
     print('#### Python process still running')
     failure = True
 
