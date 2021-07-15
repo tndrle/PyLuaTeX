@@ -48,13 +48,18 @@ The folder `example` contains additional example documents:
   Demonstrates the use of different Python sessions in a document
 * `data-visualization.tex`  
   Demonstrates the visualization of data using *pgfplots* and *pandas*
+* `matplotlib-external.tex`  
+  Demonstrates how *matplotlib* plots can be generated and included in a document
+* `matplotlib-pgf.tex`  
+  Demonstrates how *matplotlib* plots can be generated and included in a document using *PGF*
 
 For more intricate use cases have a look at our tests in the folder `test`.
 
 ## Installation
-PyLuaTeX is not yet available through package managers or [CTAN](https://ctan.org).
+PyLuaTeX is available on [CTAN](https://ctan.org/pkg/pyluatex) and in MiKTeX.
+It will be available in TeX Live soon (when you read this it probably already is).
 
-To install PyLuaTeX, do the following steps:
+To install PyLuaTeX **manually**, do the following steps:
 1. Locate your local *TEXMF* folder  
 The location of this folder may vary. Typical defaults for TeX Live are `~/texmf` for Linux,
 `~/Library/texmf` for macOS, and `C:\Users\<user name>\texmf` for Windows.
