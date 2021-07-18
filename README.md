@@ -64,7 +64,7 @@ For more intricate use cases have a look at our tests in the folder `test`.
 PyLuaTeX is available in TeX Live, MiKTeX, and on [CTAN](https://ctan.org/pkg/pyluatex) as `pyluatex`.
 
 To install PyLuaTeX in **TeX Live** run `tlmgr install pyluatex`.  
-In **MikTeX**, PyLuaTeX can be installed in the *MiKTeX Console*.
+In **MiKTeX**, PyLuaTeX can be installed in the *MiKTeX Console*.
 
 To install PyLuaTeX **manually**, do the following steps:
 1. Locate your local *TEXMF* folder  
