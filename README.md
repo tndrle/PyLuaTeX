@@ -7,7 +7,11 @@ LaTeX documents must be compiled with LuaLaTeX for this to work.
 [![Tests workflow](https://github.com/tndrle/PyLuaTeX/actions/workflows/tests.yml/badge.svg)](https://github.com/tndrle/PyLuaTeX/actions)
 
 ## Example
-1. LaTeX document `example.tex`
+1. LaTeX document `example.tex`  
+**Note:** PyLuaTeX starts Python 3 using the command `python3` by default.
+If `python3` does not start Python 3 on your system, find the correct command
+and replace `\usepackage{pyluatex}` with `\usepackage[executable={your python command}]{pyluatex}`.
+For example, `\usepackage[executable=python.exe]{pyluatex}`.
 ```latex
 \documentclass{article}
 
@@ -32,6 +36,7 @@ $\sqrt{371} = \py{math.sqrt(371)}$
 \randint{2}{5}
 \end{document}
 ```
+
 2. Compile using LuaLaTeX (shell escape is required)
 ```
 lualatex -shell-escape example.tex
