@@ -41,8 +41,10 @@ jobs:
         run: |
           python3 -m pip install --upgrade pip
           python3 -m pip install pandas matplotlib
+          tlmgr option -- autobackup 0
           tlmgr update --self
           tlmgr install pgfplots lualatex-math
+          tlmgr remove pyluatex || true
       - name: Copy repository to LaTeX package folder
         run: |
           mkdir -p ~/texmf/tex/latex/pyluatex
