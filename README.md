@@ -57,6 +57,12 @@ The folder `example` contains additional example documents:
   Demonstrates how *matplotlib* plots can be generated and included in a document
 * `matplotlib-pgf.tex`  
   Demonstrates how *matplotlib* plots can be generated and included in a document using *PGF*
+* `typesetting-example.tex`  
+  The code typesetting example below
+* `typesetting-listings.tex`  
+  A detailed example for typesetting code and output with the *listings* package
+* `typesetting-minted.tex`  
+  A detailed example for typesetting code and output with the *minted* package
 
 For more intricate use cases have a look at our tests in the folder `test`.
 
@@ -87,6 +93,12 @@ TEXMF/tex/latex/pyluatex/
 ## Reference
 PyLuaTeX offers a simple set of options, macros and environments.
 
+Most macros and environments are available as *quiet* versions as well.
+They have the suffix `q` in their name, e.g. `\pycq` or `\pyfileq`.
+The quiet versions suppress any output, even if the Python code explicitly calls `print()`.
+This is helpful if you want to process code or output further and do your own typesetting.
+For an example, see the [Typesetting Code](#typesetting-code) section.
+
 ### Package Options
 * `verbose`  
   If this option is enabled, Python input and output is written to the log file.  
@@ -97,14 +109,23 @@ PyLuaTeX offers a simple set of options, macros and environments.
 
 ### Macros
 * `\py{code}`  
-  Executes `code` and writes the output to the document.  
+  Executes (object-like) `code` and writes its string representation to the document.  
   *Example:* `\py{3 + 7}`
+* `\pyq{code}`  
+  Executes (object-like) `code`. Any output is suppressed.  
+  *Example:* `\pyq{3 + 7}`
 * `\pyc{code}`  
-  Executes `code`  
-  *Example:* `\pyc{x = 5}`
+  Executes `code`. Output (e.g. from a call to `print()`) is written to the document.  
+  *Examples:* `\pyc{x = 5}`, `\pyc{print('hello')}`
+* `\pycq{code}`  
+  Executes `code`. Any output is suppressed.  
+  *Example:* `\pycq{x = 5}`
 * `\pyfile{path}`  
-  Executes the Python file specified by `path`.  
+  Executes the Python file specified by `path`. Output (e.g. from a call to `print()`) is written to the document.  
   *Example:* `\pyfile{main.py}`
+* `\pyfileq{path}`  
+  Executes the Python file specified by `path`. Any output is suppressed.  
+  *Example:* `\pyfileq{main.py}`
 * `\pysession{session}`  
   Selects `session` as Python session for subsequent Python code.  
   The session that is active at the beginning is `default`.  
@@ -123,6 +144,8 @@ PyLuaTeX offers a simple set of options, macros and environments.
       print(x)
   \end{python}
   ```
+* `pythonq`  
+  Same as the `python` environment, but any output is suppressed.
 
 ## Requirements
 * LuaLaTeX
@@ -131,6 +154,58 @@ PyLuaTeX offers a simple set of options, macros and environments.
 
 Our automated tests currently use TeX Live 2021 and Python 3.7+ on
 Ubuntu 20.04, macOS Catalina 10.15 and Windows Server 2019.
+
+## Typesetting Code
+Sometimes, in addition to having Python code executed and the output written to your document, you also want to show the code itself in your document.
+PyLuaTeX does not offer any macros or environments that directly typeset code.
+However, PyLuaTeX has a **code and output buffer** which you can use to create your own typesetting functionality.
+This provides a lot of flexibility for your typesetting.
+
+After a PyLuaTeX macro or environment has been executed, the corresponding Python code and output can be accessed via the Lua functions `pyluatex.get_last_code()` and `pyluatex.get_last_output()`, respectively.
+Both functions return a Lua [table](https://www.lua.org/pil/2.5.html) where each table item corresponds to a line of code or output.
+
+A simple example for typesetting code and output using the *listings* package would be:
+```latex
+\documentclass{article}
+
+\usepackage{pyluatex}
+\usepackage{listings}
+\usepackage{luacode}
+
+\begin{luacode}
+function pytypeset()
+    tex.print("\\begin{lstlisting}[language=Python]")
+    tex.print(pyluatex.get_last_code())
+    tex.print("\\end{lstlisting}")
+    tex.print("") -- ensure newline
+end
+\end{luacode}
+
+\newcommand*{\pytypeset}{%
+    \noindent\textbf{Input:}
+    \directlua{pytypeset()}
+    \textbf{Output:}
+    \begin{center}
+        \directlua{tex.print(pyluatex.get_last_output())}
+    \end{center}
+}
+
+\begin{document}
+
+\begin{pythonq}
+greeting = 'Hello PyLuaTeX!'
+print(greeting)
+\end{pythonq}
+\pytypeset
+
+\end{document}
+```
+
+Notice that we use the `pythonq` environment, which suppresses any output.
+After that, the custom macro `\pytypeset` is responsible for typesetting the code and its output.
+
+Using a different code listings package like *minted*, or typesetting inline code is very easy.
+See the `typesetting-*.tex` examples in the `example` folder.
 
 ## How It Works
 PyLuaTeX runs a Python [`InteractiveInterpreter`](https://docs.python.org/3/library/code.html#code.InteractiveInterpreter) (actually several if you use different sessions) in the background for on the fly code execution.

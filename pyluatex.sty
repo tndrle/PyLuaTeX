@@ -30,17 +30,22 @@
 
 \directlua{pyluatex.start([==[\pyluatex@executable]==])}
 
-\newenvironment{python}{\directlua{pyluatex.record_env()}}%
+\newenvironment{python}{\directlua{pyluatex.record_env(false)}}%
 {\directlua{pyluatex.print_env()}}
 
-\newcommand*{\py}[1]{%
-\directlua{pyluatex.execute([==[print(str(#1), end='')]==], true)}%
-}
+\newenvironment{pythonq}{\directlua{pyluatex.record_env(true)}}{}
 
-\newcommand*{\pyc}[1]{\directlua{pyluatex.execute([==[#1]==], true)}}
+\newcommand*{\python@inline}[3]{\directlua{pyluatex.execute([==[#1]==], #2, #3)}}
+
+\newcommand*{\py}[1]{\python@inline{#1}{true}{true}}
+\newcommand*{\pyq}[1]{\python@inline{#1}{true}{false}}
+
+\newcommand*{\pyc}[1]{\python@inline{#1}{false}{true}}
+\newcommand*{\pycq}[1]{\python@inline{#1}{false}{false}}
 
 \newcommand*{\pysession}[1]{\directlua{pyluatex.session = [==[#1]==]}}
 
-\newcommand*{\pyfile}[1]{\directlua{pyluatex.run_file([==[#1]==])}}
+\newcommand*{\pyfile}[1]{\directlua{pyluatex.run_file([==[#1]==], true)}}
+\newcommand*{\pyfileq}[1]{\directlua{pyluatex.run_file([==[#1]==], false)}}
 
 \endinput

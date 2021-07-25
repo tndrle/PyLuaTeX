@@ -40,10 +40,11 @@ jobs:
       - name: Install dependencies
         run: |
           python3 -m pip install --upgrade pip
-          python3 -m pip install pandas matplotlib
+          python3 -m pip install pandas matplotlib Pygments
           tlmgr option -- autobackup 0
           tlmgr update --self
-          tlmgr install pgfplots lualatex-math
+          tlmgr install pgfplots lualatex-math luacode listings
+          tlmgr install fvextra catchfile xstring framed minted
           tlmgr remove pyluatex || true
       - name: Copy repository to LaTeX package folder
         run: |
@@ -62,3 +63,6 @@ jobs:
           lualatex -shell-escape --interaction=nonstopmode sessions.tex
           lualatex -shell-escape --interaction=nonstopmode matplotlib-external.tex
           lualatex -shell-escape --interaction=nonstopmode matplotlib-pgf.tex
+          lualatex -shell-escape --interaction=nonstopmode typesetting-example.tex
+          lualatex -shell-escape --interaction=nonstopmode typesetting-listings.tex
+          lualatex -shell-escape --interaction=nonstopmode typesetting-minted.tex
