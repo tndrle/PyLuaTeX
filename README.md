@@ -36,7 +36,6 @@ $\sqrt{371} = \py{math.sqrt(371)}$
 \randint{2}{5}
 \end{document}
 ```
-
 2. Compile using LuaLaTeX (shell escape is required)
 ```
 lualatex -shell-escape example.tex
@@ -162,7 +161,7 @@ However, PyLuaTeX has a **code and output buffer** which you can use to create y
 This provides a lot of flexibility for your typesetting.
 
 After a PyLuaTeX macro or environment has been executed, the corresponding Python code and output can be accessed via the Lua functions `pyluatex.get_last_code()` and `pyluatex.get_last_output()`, respectively.
-Both functions return a Lua [table](https://www.lua.org/pil/2.5.html) where each table item corresponds to a line of code or output.
+Both functions return a Lua [table](https://www.lua.org/pil/2.5.html) (basically an array) where each table item corresponds to a line of code or output.
 
 A simple example for typesetting code and output using the *listings* package would be:
 ```latex
