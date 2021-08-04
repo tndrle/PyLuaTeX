@@ -35,13 +35,13 @@
 
 \newenvironment{pythonq}{\directlua{pyluatex.record_env(true)}}{}
 
-\newcommand*{\python@inline}[3]{\directlua{pyluatex.execute([==[#1]==], #2, #3)}}
+\newcommand*{\pyluatex@inline}[3]{\directlua{pyluatex.execute([==[#1]==], #2, #3)}}
 
-\newcommand*{\py}[1]{\python@inline{#1}{true}{true}}
-\newcommand*{\pyq}[1]{\python@inline{#1}{true}{false}}
+\newcommand*{\py}[1]{\pyluatex@inline{#1}{true}{true}}
+\newcommand*{\pyq}[1]{\pyluatex@inline{#1}{true}{false}}
 
-\newcommand*{\pyc}[1]{\python@inline{#1}{false}{true}}
-\newcommand*{\pycq}[1]{\python@inline{#1}{false}{false}}
+\newcommand*{\pyc}[1]{\pyluatex@inline{#1}{false}{true}}
+\newcommand*{\pycq}[1]{\pyluatex@inline{#1}{false}{false}}
 
 \newcommand*{\pysession}[1]{\directlua{pyluatex.session = [==[#1]==]}}
 
