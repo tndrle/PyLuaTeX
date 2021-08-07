@@ -1,0 +1,15 @@
+\documentclass{article}
+
+\usepackage{pyluatex}
+
+\newenvironment{custompy}
+{\PyLTVerbatimEnv\begin{python}}
+{\end{python}}
+
+\begin{document}
+
+\begin{custompy}
+print('Hello PyLuaTeX')
+\end{custompy}
+
+\end{document}

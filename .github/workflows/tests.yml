@@ -66,3 +66,4 @@ jobs:
           lualatex -shell-escape --interaction=nonstopmode typesetting-example.tex
           lualatex -shell-escape --interaction=nonstopmode typesetting-listings.tex
           lualatex -shell-escape --interaction=nonstopmode typesetting-minted.tex
+          lualatex -shell-escape --interaction=nonstopmode readme-custom-env.tex

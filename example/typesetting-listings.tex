@@ -61,6 +61,7 @@ end
 
 \maketitle
 
+\section*{Typesetting of Code Blocks and Ouput}
 \begin{pythonq}
 msg = 'Hello'
 
@@ -68,6 +69,7 @@ print(msg)
 \end{pythonq}
 \pytypeset
 
+\section*{Typesetting of Inline Code and Ouput}
 Calling \pycq{print('test', end='')}\codeinline\ in Python outputs ``\outputraw''.
 
 \begin{python}
@@ -76,5 +78,18 @@ x = 4
 The value of \pyq{x}\codeinline\ is \outputraw.
 
 The result of \pyq{17 + 300}$\coderaw$ is \outputraw.
+
+\section*{Custom Environments}
+You can create a custom environment for typesetting:
+
+\newenvironment{typesetpython}
+{\PyLTVerbatimEnv\begin{pythonq}}
+{\end{pythonq}\pytypeset}
+
+\begin{typesetpython}
+msg = 'Custom environment'
+
+print(msg)
+\end{typesetpython}
 
 \end{document}

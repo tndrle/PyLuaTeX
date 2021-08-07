@@ -146,6 +146,15 @@ For an example, see the [Typesetting Code](#typesetting-code) section.
 * `pythonq`  
   Same as the `python` environment, but any output is suppressed.
 
+You can create your own environments based on the `python` and `pythonq` environments.
+However, since they are verbatim environments, you have to use the macro `\PyLTVerbatimEnv`
+in your environment definition, e.g.
+```latex
+\newenvironment{custompy}
+{\PyLTVerbatimEnv\begin{python}}
+{\end{python}}
+```
+
 ## Requirements
 * LuaLaTeX
 * Python 3
@@ -204,6 +213,7 @@ Notice that we use the `pythonq` environment, which suppresses any output.
 After that, the custom macro `\pytypeset` is responsible for typesetting the code and its output.
 
 Using a different code listings package like *minted*, or typesetting inline code is very easy.
+You can also define your own environments that combine Python code and typesetting.
 See the `typesetting-*.tex` examples in the `example` folder.
 
 ## How It Works

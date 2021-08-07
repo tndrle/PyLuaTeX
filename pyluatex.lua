@@ -37,6 +37,7 @@ local tcp = nil
 
 local env_end = nil
 local env_lines = nil
+local parent_env = nil
 
 local last_code = nil
 local last_output = nil
@@ -149,13 +150,26 @@ local function record_line(line)
 end
 
 function pyluatex.record_env(quiet)
-    if quiet then
-        env_end = "\\end{pythonq}"
+    local name
+    if parent_env ~= nil then
+        name = parent_env
+        parent_env = nil
     else
-        env_end = "\\end{python}"
+        if quiet then
+            name = "pythonq"
+        else
+            name = "python"
+        end
     end
+    env_end = "\\end{" .. name .. "}"
     env_lines = {}
     luatexbase.add_to_callback("process_input_buffer", record_line, "pyluatex_record_line")
+end
+
+function pyluatex.set_parent_env(name)
+    if parent_env == nil then
+        parent_env = name
+    end
 end
 
 function pyluatex.run_file(path, write)

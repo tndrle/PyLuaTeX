@@ -30,6 +30,8 @@
 
 \directlua{pyluatex.start([==[\pyluatex@executable]==])}
 
+\newcommand*{\PyLTVerbatimEnv}{\directlua{pyluatex.set_parent_env([==[\@currenvir]==])}}
+
 \newenvironment{python}{\directlua{pyluatex.record_env(false)}}%
 {\directlua{pyluatex.print_env()}}
 
