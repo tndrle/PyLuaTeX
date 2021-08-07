@@ -4,6 +4,8 @@
 PyLuaTeX allows you to execute Python code and to include the resulting output in your LaTeX documents in a *single compilation run*.
 LaTeX documents must be compiled with LuaLaTeX for this to work.
 
+[![GitHub release (latest by date)](https://img.shields.io/github/v/release/tndrle/pyluatex)](https://github.com/tndrle/PyLuaTeX/releases/latest)
+[![CTAN](https://img.shields.io/ctan/v/pyluatex.svg)](https://ctan.org/pkg/pyluatex)
 [![Tests workflow](https://github.com/tndrle/PyLuaTeX/actions/workflows/tests.yml/badge.svg)](https://github.com/tndrle/PyLuaTeX/actions)
 
 ## Example
