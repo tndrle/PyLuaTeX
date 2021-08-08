@@ -1,0 +1,122 @@
+%% Copyright 2021 Tobias Enderle
+%%
+%% This work may be distributed and/or modified under the
+%% conditions of the LaTeX Project Public License, either version 1.3
+%% of this license or (at your option) any later version.
+%% The latest version of this license is in
+%%   http://www.latex-project.org/lppl.txt
+%% and version 1.3 or later is part of all distributions of LaTeX
+%% version 2005/12/01 or later.
+
+\documentclass{beamer}
+
+\usepackage{pyluatex}
+\usepackage{listings}
+\usepackage{xcolor}
+\lstset{
+    language=Python,
+    breaklines=true,
+    framesep=1ex,
+    frame=lrtb,
+    framerule=0pt,
+    numbers=none,
+    basicstyle=\ttfamily,
+    keywordstyle=\bfseries\color{green!40!black},
+    stringstyle=\bfseries\color{red!80!black},
+    identifierstyle=\color{blue},
+    backgroundcolor=\color{gray!10!white},
+}
+
+\usepackage{luacode}
+\begin{luacode}
+function pytypeset()
+    tex.print("\\begin{lstlisting}[language=Python]")
+    tex.print(pyluatex.get_last_code())
+    tex.print("\\end{lstlisting}")
+    tex.print("") -- ensure newline
+end
+
+function pytypeset_inline()
+    -- assume there is only one line of code in get_last_code()
+    tex.print("\\lstinline[columns=fixed]@" .. pyluatex.get_last_code()[1] .. "@")
+end
+\end{luacode}
+
+\newcommand*{\pytypeset}{%
+    \textbf{Input:}
+    \directlua{pytypeset()}
+    \textbf{Output:}
+    \begin{center}
+        \directlua{tex.print(pyluatex.get_last_output())}
+    \end{center}
+}
+\newcommand*{\coderaw}{\directlua{tex.print(pyluatex.get_last_code())}}
+\newcommand*{\codeinline}{\directlua{pytypeset_inline()}}
+\newcommand*{\outputraw}{\directlua{tex.print(pyluatex.get_last_output())}}
+
+\title{PyLuaTeX Example -- BEAMER Presentation}
+\author{Tobias Enderle}
+
+\begin{document}
+
+\maketitle
+
+%%%%%%%%%%%%%%%%%%%%%% frame
+
+\begin{frame}{Important}
+Using PyLuaTeX environments (\emph{python} or \emph{pythonq}) inside BEAMER frames
+requires the \emph{fragile} option for those frames.
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%% frame
+
+\begin{frame}[fragile]{Slide 1}
+\begin{pythonq}
+msg = 'Hello slide 1'
+
+print(msg)
+\end{pythonq}
+\pytypeset
+
+Calling \pycq{print('test', end='')}\codeinline\ in Python outputs ``\outputraw''.
+
+\begin{python}
+x = 4
+\end{python}
+The value of \pyq{x}\codeinline\ is \outputraw.
+
+The result of \pyq{17 + 300}$\coderaw$ is \outputraw.
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%% frame
+
+\begin{pythonq}
+msg = 'Hello slide 2'
+
+print(msg)
+\end{pythonq}
+
+\begin{frame}{Slide 1}
+\pytypeset
+
+The \emph{fragile} option is not required in this frame because
+the \emph{pythonq} environment is outside the frame.
+Only the macro \emph{\textbackslash pytypeset} for typesetting the code and output is inside
+the frame.
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%% frame
+
+\newenvironment{typesetpython}
+    {\PyLTVerbatimEnv\begin{pythonq}}
+    {\end{pythonq}\pytypeset}
+
+\begin{frame}[fragile]{Slide 2}
+\begin{typesetpython}
+msg = 'Custom environment'
+
+print(msg)
+\end{typesetpython}
+\end{frame}
+
+\end{document}

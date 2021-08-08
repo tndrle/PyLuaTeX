@@ -69,6 +69,8 @@ assertFails('failing', 'InvalidIndentation')
 assertFails('failing', 'WrongSession')
 assertFails('failing', 'NoMultiline')
 assertFails('failing', 'AllOnOneLine')
+assertFails('failing-beamer', 'FrameNotFragile')
+assertSucceeds('succeeding-beamer', 'All')
 
 if is_windows:
     result = subprocess.run(

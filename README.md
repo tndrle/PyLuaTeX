@@ -48,16 +48,18 @@ executed. For this reason, it is recommended to compile trusted documents only.
 
 ### Further Examples
 The folder `example` contains additional example documents:
-* `readme-example.tex`  
-  The example above
-* `sessions.tex`  
-  Demonstrates the use of different Python sessions in a document
+* `beamer.tex`  
+  Demonstrates the use of PyLuaTeX environments and typesetting in *BEAMER* presentations. In particular, the `fragile` option for frames is highlighted.
 * `data-visualization.tex`  
   Demonstrates the visualization of data using *pgfplots* and *pandas*
 * `matplotlib-external.tex`  
   Demonstrates how *matplotlib* plots can be generated and included in a document
 * `matplotlib-pgf.tex`  
   Demonstrates how *matplotlib* plots can be generated and included in a document using *PGF*
+* `readme-example.tex`  
+  The example above
+* `sessions.tex`  
+  Demonstrates the use of different Python sessions in a document
 * `typesetting-example.tex`  
   The code typesetting example below
 * `typesetting-listings.tex`  
