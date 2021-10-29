@@ -10,10 +10,6 @@ LaTeX documents must be compiled with LuaLaTeX for this to work.
 
 ## Example
 1. LaTeX document `example.tex`  
-**Note:** PyLuaTeX starts Python 3 using the command `python3` by default.
-If `python3` does not start Python 3 on your system, find the correct command
-and replace `\usepackage{pyluatex}` with `\usepackage[executable={your python command}]{pyluatex}`.
-For example, `\usepackage[executable=python.exe]{pyluatex}`.
 ```latex
 \documentclass{article}
 
@@ -38,6 +34,11 @@ $\sqrt{371} = \py{math.sqrt(371)}$
 \randint{2}{5}
 \end{document}
 ```
+**Note:** PyLuaTeX starts Python 3 using the command `python3` by default.
+If `python3` does not start Python 3 on your system, find the correct command
+and replace `\usepackage{pyluatex}` with `\usepackage[executable={your python command}]{pyluatex}`.
+For example, `\usepackage[executable=python.exe]{pyluatex}`.
+
 2. Compile using LuaLaTeX (shell escape is required)
 ```
 lualatex -shell-escape example.tex
@@ -58,6 +59,8 @@ The folder `example` contains additional example documents:
   Demonstrates how *matplotlib* plots can be generated and included in a document using *PGF*
 * `readme-example.tex`  
   The example above
+* `repl.tex`  
+  Demonstrates how a Python console/REPL can be run and typeset
 * `sessions.tex`  
   Demonstrates the use of different Python sessions in a document
 * `typesetting-example.tex`  
@@ -104,11 +107,18 @@ For an example, see the [Typesetting Code](#typesetting-code) section.
 
 ### Package Options
 * `verbose`  
-  If this option is enabled, Python input and output is written to the log file.  
+  If this option is set, Python input and output is written to the LaTeX log file.  
   *Example:* `\usepackage[verbose]{pyluatex}`
 * `executable`  
   Specifies the path to the Python executable. (default: `python3`)  
   *Example:* `\usepackage[executable=/usr/local/bin/python3]{pyluatex}`
+* `ignoreerrors`  
+  By default, PyLuaTeX aborts the compilation process when Python reports an error.
+  If the `ignoreerrors` option is set, the compilation process is not aborted.  
+  *Example:* `\usepackage[ignoreerrors]{pyluatex}`
+
+Package options (except for `executable`) can be changed in the document with the
+`\pyoption` command, e.g. `\pyoption{verbose}{true}` or `\pyoption{ignoreerrors}{false}`.
 
 ### Macros
 * `\py{code}`  
@@ -133,6 +143,10 @@ For an example, see the [Typesetting Code](#typesetting-code) section.
   Selects `session` as Python session for subsequent Python code.  
   The session that is active at the beginning is `default`.  
   *Example:* `\pysession{main}`
+* `\pyoption{option}{value}`  
+  Assigns `value` to the package option `option` anywhere in the document. For more information consider
+  the [Package Options](#package-options) section.  
+  *Example:* `\pyoption{verbose}{true}`
 
 ### Environments
 * `python`  
@@ -149,8 +163,13 @@ For an example, see the [Typesetting Code](#typesetting-code) section.
   ```
 * `pythonq`  
   Same as the `python` environment, but any output is suppressed.
+* `pythonrepl`  
+  Executes the provided block of Python code in an interactive console/REPL. Code and output are
+  stored together in the output buffer and can be typeset as explained in section
+  [Typesetting Code](#typesetting-code) or as shown in the example `repl.tex` in the folder
+  `example`.
 
-You can create your own environments based on the `python` and `pythonq` environments.
+You can create your own environments based on the `python`, `pythonq` and `pythonrepl` environments.
 However, since they are verbatim environments, you have to use the macro `\PyLTVerbatimEnv`
 in your environment definition, e.g.
 ```latex
@@ -219,6 +238,8 @@ After that, the custom macro `\pytypeset` is responsible for typesetting the cod
 Using a different code listings package like *minted*, or typesetting inline code is very easy.
 You can also define your own environments that combine Python code and typesetting.
 See the `typesetting-*.tex` examples in the `example` folder.
+
+To emulate an interactive Python console/REPL, the `pythonrepl` environment can be used.
 
 ## How It Works
 PyLuaTeX runs a Python [`InteractiveInterpreter`](https://docs.python.org/3/library/code.html#code.InteractiveInterpreter) (actually several if you use different sessions) in the background for on the fly code execution.

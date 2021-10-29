@@ -25,19 +25,32 @@
 
 \RequirePackage{kvoptions}
 \DeclareStringOption[python3]{executable}
-\DeclareVoidOption{verbose}{\directlua{pyluatex.verbose = true}}
+\DeclareBoolOption{ignoreerrors}
+\DeclareBoolOption{verbose}
 \ProcessKeyvalOptions*
 
+\ifpyluatex@ignoreerrors
+    \directlua{pyluatex.ignore_errors = true}
+\else
+    \directlua{pyluatex.ignore_errors = false}
+\fi
+\ifpyluatex@verbose
+    \directlua{pyluatex.verbose = true}
+\else
+    \directlua{pyluatex.verbose = false}
+\fi
 \directlua{pyluatex.start([==[\pyluatex@executable]==])}
 
 \newcommand*{\PyLTVerbatimEnv}{\directlua{pyluatex.set_parent_env([==[\@currenvir]==])}}
 
-\newenvironment{python}{\directlua{pyluatex.record_env(false)}}%
+\newenvironment{python}{\directlua{pyluatex.record_env("python", false)}}%
 {\directlua{pyluatex.print_env()}}
 
-\newenvironment{pythonq}{\directlua{pyluatex.record_env(true)}}{}
+\newenvironment{pythonq}{\directlua{pyluatex.record_env("pythonq", false)}}{}
 
-\newcommand*{\pyluatex@inline}[3]{\directlua{pyluatex.execute([==[#1]==], #2, #3)}}
+\newenvironment{pythonrepl}{\directlua{pyluatex.record_env("pythonrepl", true)}}{}
+
+\newcommand*{\pyluatex@inline}[3]{\directlua{pyluatex.execute([==[#1]==], #2, #3, false)}}
 
 \newcommand*{\py}[1]{\pyluatex@inline{#1}{true}{true}}
 \newcommand*{\pyq}[1]{\pyluatex@inline{#1}{true}{false}}
@@ -46,8 +59,10 @@
 \newcommand*{\pycq}[1]{\pyluatex@inline{#1}{false}{false}}
 
 \newcommand*{\pysession}[1]{\directlua{pyluatex.session = [==[#1]==]}}
+\newcommand*{\pyoption}[2]{\directlua{pyluatex.set_option([==[#1]==], [==[#2]==])}}
 
-\newcommand*{\pyfile}[1]{\directlua{pyluatex.run_file([==[#1]==], true)}}
-\newcommand*{\pyfileq}[1]{\directlua{pyluatex.run_file([==[#1]==], false)}}
+\newcommand*{\pyfile}[1]{\directlua{pyluatex.run_file([==[#1]==], true, false)}}
+\newcommand*{\pyfileq}[1]{\directlua{pyluatex.run_file([==[#1]==], false, false)}}
+\newcommand*{\pyfilerepl}[1]{\directlua{pyluatex.run_file([==[#1]==], false, true)}}
 
 \endinput

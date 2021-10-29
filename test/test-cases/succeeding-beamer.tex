@@ -11,6 +11,34 @@
 \documentclass{beamer}
 
 \usepackage{pyluatex}
+\usepackage{listings}
+\usepackage{xcolor}
+\lstset{
+    language=Python,
+    breaklines=true,
+    framesep=1ex,
+    frame=lrtb,
+    framerule=0pt,
+    numbers=none,
+    basicstyle=\ttfamily,
+    keywordstyle=\bfseries\color{green!40!black},
+    stringstyle=\bfseries\color{red!80!black},
+    identifierstyle=\color{blue},
+    backgroundcolor=\color{gray!10!white},
+}
+\usepackage{luacode}
+
+\begin{luacode}
+function pytypeset()
+    tex.print("\\begin{lstlisting}[language=Python]")
+    tex.print(pyluatex.get_last_output())
+    tex.print("\\end{lstlisting}")
+end
+\end{luacode}
+
+\newenvironment{pyrepl}
+{\PyLTVerbatimEnv\begin{pythonrepl}}
+{\end{pythonrepl}\directlua{pytypeset()}}
 
 \begin{document}
 
@@ -21,6 +49,13 @@
 \begin{python}
 print('A')
 \end{python}
+
+\begin{pyrepl}
+def a():
+    return 'x'
+
+a()
+\end{pyrepl}
 
 \fi
 

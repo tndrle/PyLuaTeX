@@ -30,8 +30,36 @@ import socketserver
 import json
 import textwrap
 from collections import defaultdict
+import re
 
 class Interpreter(InteractiveInterpreter):
+    def execute_repl(self, code, ignore_errors):
+        self.success = True
+        output = ''
+        incomplete = False
+        for line in re.split('\r?\n', code):
+            output += ('... ' if incomplete else '>>> ') + line + '\n'
+            if incomplete:
+                buffer += '\n' + line
+            else:
+                buffer = line
+            with StringIO() as out, redirect_stdout(out), redirect_stderr(out):
+                try:
+                    code_obj = compile_command(buffer)
+                    if code_obj is not None:
+                        incomplete = False
+                        self.runcode(code_obj)
+                    else:
+                        incomplete = True
+                except:
+                    incomplete = False
+                    traceback.print_exc(limit=0)
+                    self.success = False
+                output += out.getvalue()
+            if not ignore_errors and not self.success:
+                return False, output
+        return self.success, output
+
     def execute(self, code):
         with StringIO() as out, redirect_stdout(out), redirect_stderr(out):
             self.success = True
@@ -61,7 +89,14 @@ class Handler(socketserver.StreamRequestHandler):
 
             data = json.loads(data)
             interpreter = interpreters[data['session']]
-            success, output = interpreter.execute(textwrap.dedent(data['code']))
+            code = textwrap.dedent(data['code'])
+            if data['repl_mode']:
+                success, output = interpreter.execute_repl(
+                    code,
+                    data['ignore_errors']
+                )
+            else:
+                success, output = interpreter.execute(code)
             response = { 'success': success, 'output': output }
             self.wfile.write((json.dumps(response) + '\n').encode('utf-8'))
 

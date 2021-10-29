@@ -26,6 +26,7 @@ local json = require("pyluatex-json")
 local socket = require("socket")
 
 pyluatex = pyluatex or {
+    ignore_errors = false,
     verbose = false,
     session = "default"
 }
@@ -38,9 +39,14 @@ local tcp = nil
 local env_end = nil
 local env_lines = nil
 local parent_env = nil
+local env_repl_mode = false
 
 local last_code = nil
 local last_output = nil
+
+local function trim(s)
+    return (s:gsub("^%s*(.-)%s*$", "%1"))
+end
 
 local function err_cmd(message)
     return "\\PackageError{PyLuaTeX}{" .. message .. "}{}"
@@ -94,7 +100,7 @@ local function split_lines(str)
     return t
 end
 
-function pyluatex.execute(code, auto_print, write)
+function pyluatex.execute(code, auto_print, write, repl_mode)
     local full_code
     if auto_print then
         full_code = "print(str(" .. code .. "), end='')"
@@ -104,12 +110,19 @@ function pyluatex.execute(code, auto_print, write)
 
     if pyluatex.verbose then log_input(full_code) end
 
-    local success, output = request({ session = pyluatex.session, code = full_code })
+    local success, output = request(
+        {
+            session = pyluatex.session,
+            code = full_code,
+            repl_mode = repl_mode,
+            ignore_errors = pyluatex.ignore_errors
+        }
+    )
     last_code = split_lines(code)
     last_output = split_lines(output)
 
-    if success then
-        if pyluatex.verbose then log_output(output) end
+    if success or pyluatex.ignore_errors then
+        if pyluatex.verbose or not success then log_output(output) end
 
         if write then
             tex.print(last_output)
@@ -135,10 +148,14 @@ local function record_line(line)
     local s, e = line:find(env_end, 1, true)
     if s ~= nil then
         luatexbase.remove_from_callback("process_input_buffer", "pyluatex_record_line")
-        table.insert(env_lines, line:sub(1, s - 1))
+        local code_in_line = line:sub(1, s - 1)
+        if trim(code_in_line):len() > 0 then
+            -- only include this line if it contains non-whitespace characters
+            table.insert(env_lines, code_in_line)
+        end
         local code = table.concat(env_lines, "\n")
-        local success = pyluatex.execute(code, false, false)
-        if success then
+        local success = pyluatex.execute(code, false, false, env_repl_mode)
+        if success or pyluatex.ignore_errors then
             return line:sub(s)
         else
             return env_end .. err_cmd("Python error (see above)") .. line:sub(e + 1)
@@ -149,20 +166,14 @@ local function record_line(line)
     end
 end
 
-function pyluatex.record_env(quiet)
-    local name
+function pyluatex.record_env(name, repl_mode)
     if parent_env ~= nil then
         name = parent_env
         parent_env = nil
-    else
-        if quiet then
-            name = "pythonq"
-        else
-            name = "python"
-        end
     end
     env_end = "\\end{" .. name .. "}"
     env_lines = {}
+    env_repl_mode = repl_mode
     luatexbase.add_to_callback("process_input_buffer", record_line, "pyluatex_record_line")
 end
 
@@ -172,12 +183,18 @@ function pyluatex.set_parent_env(name)
     end
 end
 
-function pyluatex.run_file(path, write)
+function pyluatex.run_file(path, write, repl_mode)
     local f = io.open(path, "r")
     if f then
         local code = f:read("*a")
         f:close()
-        pyluatex.execute(code, false, write)
+        -- ignore trailing new line if present
+        if code:sub(-2) == "\r\n" then
+            code = code:sub(0, -3)
+        elseif code:sub(-1) == "\n" then
+            code = code:sub(0, -2)
+        end
+        pyluatex.execute(code, false, write, repl_mode)
     else
         tex.sprint(err_cmd("File not found: " .. path))
     end
@@ -189,6 +206,28 @@ end
 
 function pyluatex.get_last_output()
     return last_output
+end
+
+local function parse_bool(name, value)
+    if value == "true" then
+        return true
+    elseif value == "false" then
+        return false
+    else
+        tex.sprint(
+            err_cmd("Invalid value '" .. value .. "' for option " .. name)
+        )
+    end
+end
+
+function pyluatex.set_option(name, value)
+    if name == "ignoreerrors" then
+        pyluatex.ignore_errors = parse_bool(name, value)
+    elseif name == "verbose" then
+        pyluatex.verbose = parse_bool(name, value)
+    else
+        tex.sprint(err_cmd("Unknown option '" .. name .. "'"))
+    end
 end
 
 return pyluatex

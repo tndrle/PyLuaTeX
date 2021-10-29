@@ -68,3 +68,4 @@ jobs:
           lualatex -shell-escape --interaction=nonstopmode typesetting-minted.tex
           lualatex -shell-escape --interaction=nonstopmode readme-custom-env.tex
           lualatex -shell-escape --interaction=nonstopmode beamer.tex
+          lualatex -shell-escape --interaction=nonstopmode repl.tex

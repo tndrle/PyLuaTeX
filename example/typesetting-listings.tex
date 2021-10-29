@@ -30,10 +30,9 @@
 \usepackage{luacode}
 \begin{luacode}
 function pytypeset()
-    tex.print("\\begin{lstlisting}[language=Python]")
+    tex.print("\\begin{lstlisting}")
     tex.print(pyluatex.get_last_code())
     tex.print("\\end{lstlisting}")
-    tex.print("") -- ensure newline
 end
 
 function pytypeset_inline()
