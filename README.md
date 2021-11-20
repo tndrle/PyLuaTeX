@@ -43,7 +43,6 @@ For example, `\usepackage[executable=python.exe]{pyluatex}`.
 ```
 lualatex -shell-escape example.tex
 ```
-
 **Note:** Running LaTeX with the shell escape option enabled allows arbitrary code to be
 executed. For this reason, it is recommended to compile trusted documents only.
 
