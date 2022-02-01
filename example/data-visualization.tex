@@ -1,4 +1,4 @@
-%% Copyright 2021 Tobias Enderle
+%% Copyright 2021-2022 Tobias Enderle
 %%
 %% This work may be distributed and/or modified under the
 %% conditions of the LaTeX Project Public License, either version 1.3
@@ -89,12 +89,15 @@ the beginning of each decade. The values are given in thousands.
 \begin{center}
 \begin{python}
 table_data = world_data.iloc[::10].reset_index()
-table = table_data.to_latex(
-    columns=['Time', 'PopTotal', 'PopMale', 'PopFemale'],
-    index=False,
-    float_format='{:,.0f}'.format,
-    header=['Year', 'Total (thousands)', 'Male (thousands)', 'Female (thousands)']
-)
+table_data = table_data[['Time', 'PopTotal', 'PopMale', 'PopFemale']]
+table_data.columns = ['Year', 'Total (thousands)', 'Male (thousands)', 'Female (thousands)']
+table = table_data.style.hide(axis='index').format(
+    formatter={
+        'Total (thousands)': '{:,.0f}',
+        'Male (thousands)': '{:,.0f}',
+        'Female (thousands)': '{:,.0f}'
+    }
+).to_latex(hrules=True)
 print(table)
 \end{python}
 \end{center}

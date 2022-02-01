@@ -1,7 +1,7 @@
 """
 MIT License
 
-Copyright (c) 2021 Tobias Enderle
+Copyright (c) 2021-2022 Tobias Enderle
 
 Permission is hereby granted, free of charge, to any person obtaining a
 copy of this software and associated documentation files (the "Software"),
@@ -84,10 +84,13 @@ class Handler(socketserver.StreamRequestHandler):
         interpreters = defaultdict(Interpreter)
         while True:
             data = self.rfile.readline().decode('utf-8')
-            if len(data) == 0:
+            if len(data) == 0:  # socket closed, LuaTeX process finished
                 return
 
             data = json.loads(data)
+            if data == 'shutdown':
+                return
+
             interpreter = interpreters[data['session']]
             code = textwrap.dedent(data['code'])
             if data['repl_mode']:

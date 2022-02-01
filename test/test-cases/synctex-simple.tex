@@ -9,24 +9,10 @@
 %% version 2005/12/01 or later.
 
 \documentclass{article}
-
 \usepackage{pyluatex}
 
-\begin{python}
-import math
-import random
-
-random.seed(0)
-
-greeting = 'Hello PyLuaTeX!'
-\end{python}
-
-\newcommand{\randint}[2]{\py{random.randint(#1, #2)}}
-
 \begin{document}
-\py{greeting}
 
-$\sqrt{371} = \py{math.sqrt(371)}$
+Hello
 
-\randint{2}{5}
 \end{document}

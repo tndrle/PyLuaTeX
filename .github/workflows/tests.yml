@@ -17,7 +17,7 @@ jobs:
           - os: windows-latest
             CACHE_DIR: D:\texlive
             BIN_PATH: D:\texlive\bin\win32
-    timeout-minutes: 10
+    timeout-minutes: 15
     steps:
       - name: Check out repository
         uses: actions/checkout@v2
@@ -40,7 +40,7 @@ jobs:
       - name: Install dependencies
         run: |
           python3 -m pip install --upgrade pip
-          python3 -m pip install pandas matplotlib Pygments
+          python3 -m pip install -U pandas matplotlib Pygments Jinja2
           tlmgr option -- autobackup 0
           tlmgr update --self
           tlmgr install pgfplots lualatex-math luacode listings

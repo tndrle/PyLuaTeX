@@ -115,8 +115,13 @@ For an example, see the [Typesetting Code](#typesetting-code) section.
   By default, PyLuaTeX aborts the compilation process when Python reports an error.
   If the `ignoreerrors` option is set, the compilation process is not aborted.  
   *Example:* `\usepackage[ignoreerrors]{pyluatex}`
+* `shutdown`  
+  Specifies when the Python process is shut down. (default: `veryveryend`)  
+  *Options:* `veryveryend`, `veryenddocument`, `off`  
+  PyLuaTeX uses the hooks of the package *atveryend* to shut down the Python interpreter when the compilation is done. With the option `veryveryend`, Python is shut down in the `\AtVeryVeryEnd` hook. With the option `veryenddocument`, Python is shut down in the `\AtVeryEndDocument` hook. With the option `off`, Python is not shut down explicitly. However, the Python process will shut down when the LuaTeX process finishes even if `off` is selected. Using `off` on Windows might lead to problems with SyncTeX, though.  
+  *Example:* `\usepackage[veryenddocument]{pyluatex}`
 
-Package options (except for `executable`) can be changed in the document with the
+Package options (except for `executable` and `shutdown`) can be changed in the document with the
 `\pyoption` command, e.g. `\pyoption{verbose}{true}` or `\pyoption{ignoreerrors}{false}`.
 
 ### Macros
@@ -183,7 +188,7 @@ in your environment definition, e.g.
 * Linux, macOS or Windows
 
 Our automated tests currently use TeX Live 2021 and Python 3.7+ on
-Ubuntu 20.04, macOS Catalina 10.15 and Windows Server 2019.
+Ubuntu 20.04, macOS Big Sur 11 and Windows Server 2019.
 
 ## Typesetting Code
 Sometimes, in addition to having Python code executed and the output written to your document, you also want to show the code itself in your document.

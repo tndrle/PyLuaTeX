@@ -1,7 +1,7 @@
 """
 MIT License
 
-Copyright (c) 2021 Tobias Enderle
+Copyright (c) 2021-2022 Tobias Enderle
 
 Permission is hereby granted, free of charge, to any person obtaining a
 copy of this software and associated documentation files (the "Software"),
@@ -25,6 +25,7 @@ IN THE SOFTWARE.
 import sys
 import subprocess
 import platform
+import os
 
 is_windows = platform.system() == 'Windows'
 
@@ -71,6 +72,19 @@ assertFails('failing', 'NoMultiline')
 assertFails('failing', 'AllOnOneLine')
 assertFails('failing-beamer', 'FrameNotFragile')
 assertSucceeds('succeeding-beamer', 'All')
+
+print(f'#### Running SyncTeX test')
+file = 'test-cases/synctex-simple.tex'
+subprocess.run(
+    [lualatex, '-shell-escape', '--interaction=nonstopmode', '-synctex=1', file],
+    capture_output=True
+)
+if os.path.isfile('synctex-simple.synctex(busy)'):
+    print('#### *.synctex(busy) file present')
+    failure = True
+if not os.path.isfile('synctex-simple.synctex.gz'):
+    print('#### *.synctex.gz file not present')
+    failure = True
 
 if is_windows:
     result = subprocess.run(

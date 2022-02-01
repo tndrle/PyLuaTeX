@@ -1,7 +1,7 @@
 --[[
 MIT License
 
-Copyright (c) 2021 Tobias Enderle
+Copyright (c) 2021-2022 Tobias Enderle
 
 Permission is hereby granted, free of charge, to any person obtaining a
 copy of this software and associated documentation files (the "Software"),
@@ -71,6 +71,10 @@ function pyluatex.start(executable)
         tex.sprint(err_cmd("Python backend (executable: " .. executable ..
                            ") could not be started"))
     end
+end
+
+function pyluatex.shutdown()
+    tcp:send(json.encode("shutdown") .. "\n")
 end
 
 local function request(data)
