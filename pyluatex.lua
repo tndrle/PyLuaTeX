@@ -61,15 +61,25 @@ function pyluatex.start(executable)
         cmd = executable .. " \"" .. script .. "\" &"
     end
     local f = io.popen(cmd, "r")
-    local port = f:read("*l"):gsub("\r", ""):gsub("\n", "")
+    local port = f:read("*l")
     f:close()
 
-    if port then
-        tcp = socket.tcp()
-        tcp:connect("127.0.0.1", port)
-    else
-        tex.sprint(err_cmd("Python backend (executable: " .. executable ..
-                           ") could not be started"))
+    function err(message)
+        tex.sprint(err_cmd("Python backend could not be started (" .. message .. ")"))
+    end
+
+    if port == nil then
+        err("executable: " .. executable)
+        return
+    end
+    port = trim(port)
+    if port:match("^%d+$") == nil then
+        err("invalid TCP port: " .. port)
+        return
+    end
+    tcp = socket.tcp()
+    if tcp:connect("127.0.0.1", port) == nil then
+        err("TCP connection failed")
     end
 end
 
