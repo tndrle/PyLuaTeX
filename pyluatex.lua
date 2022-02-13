@@ -33,7 +33,6 @@ pyluatex = pyluatex or {
 
 -- status.filename: path to pyluatex.sty
 local folder = file.pathpart(file.collapsepath(status.filename, true))
-local script = file.join(folder, "pyluatex-interpreter.py")
 local tcp = nil
 
 local env_end = nil
@@ -53,6 +52,7 @@ local function err_cmd(message)
 end
 
 function pyluatex.start(executable)
+    local script = file.join(folder, "pyluatex-interpreter.py")
     local is_windows = package.config:sub(1,1) ~= "/"
     local cmd
     if is_windows then
