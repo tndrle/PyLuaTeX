@@ -31,6 +31,8 @@ import json
 import textwrap
 from collections import defaultdict
 import re
+import os
+import sys
 
 class Interpreter(InteractiveInterpreter):
     def execute_repl(self, code, ignore_errors):
@@ -104,6 +106,13 @@ class Handler(socketserver.StreamRequestHandler):
             self.wfile.write((json.dumps(response) + '\n').encode('utf-8'))
 
 if __name__ == '__main__':
+    try:
+        tex_file = sys.argv[1]
+        tex_file_folder = os.path.normpath(os.path.dirname(tex_file))
+        sys.path.insert(0, tex_file_folder)
+    except:
+        pass
+
     with socketserver.TCPServer(('localhost', 0), Handler) as server:
         print(server.server_address[1], end='\n', flush=True)  # publish port
         server.handle_request()

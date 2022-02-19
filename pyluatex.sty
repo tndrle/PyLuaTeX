@@ -27,20 +27,16 @@
 \DeclareStringOption[python3]{executable}
 \DeclareBoolOption{ignoreerrors}
 \DeclareBoolOption{verbose}
+\DeclareBoolOption[true]{localimports}
 \DeclareStringOption[veryveryend]{shutdown}
 \ProcessKeyvalOptions*
 
-\ifpyluatex@ignoreerrors
-    \directlua{pyluatex.ignore_errors = true}
-\else
-    \directlua{pyluatex.ignore_errors = false}
-\fi
-\ifpyluatex@verbose
-    \directlua{pyluatex.verbose = true}
-\else
-    \directlua{pyluatex.verbose = false}
-\fi
-\directlua{pyluatex.start([==[\pyluatex@executable]==])}
+\directlua{pyluatex.ignore_errors = \ifpyluatex@ignoreerrors true\else false\fi}
+\directlua{pyluatex.verbose = \ifpyluatex@verbose true\else false\fi}
+\directlua{pyluatex.start(
+    [==[\pyluatex@executable]==],
+    \ifpyluatex@localimports true\else false\fi
+)}
 
 \ExplSyntaxOn
 \cs_generate_variant:Nn \tl_if_eq:nnTF { V }

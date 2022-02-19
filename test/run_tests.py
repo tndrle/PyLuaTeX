@@ -58,12 +58,14 @@ def _run(file, test, expectSuccess):
             print(result.stderr.decode('utf-8'))
 
 def assertSucceeds(file, test):
-    return _run(file, test, True)
+    _run(file, test, True)
 
 def assertFails(file, test):
-    return _run(file, test, False)
+    _run(file, test, False)
 
-assertSucceeds('succeeding', 'All')
+assertSucceeds('local-imports-true', None)
+assertSucceeds('local-imports-false', None)
+assertSucceeds('succeeding', None)
 assertFails('failing', 'VariableNotDefined')
 assertFails('failing', 'CodeOnFirstLine')
 assertFails('failing', 'InvalidIndentation')

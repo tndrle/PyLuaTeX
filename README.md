@@ -120,8 +120,11 @@ For an example, see the [Typesetting Code](#typesetting-code) section.
   *Options:* `veryveryend`, `veryenddocument`, `off`  
   PyLuaTeX uses the hooks of the package *atveryend* to shut down the Python interpreter when the compilation is done. With the option `veryveryend`, Python is shut down in the `\AtVeryVeryEnd` hook. With the option `veryenddocument`, Python is shut down in the `\AtVeryEndDocument` hook. With the option `off`, Python is not shut down explicitly. However, the Python process will shut down when the LuaTeX process finishes even if `off` is selected. Using `off` on Windows might lead to problems with SyncTeX, though.  
   *Example:* `\usepackage[shutdown=veryenddocument]{pyluatex}`
+* `localimports`  
+  If this option is set, the folder containing the TeX input file is added to the Python path. This allows local Python packages to be imported. (default: `true`)  
+  *Example:* `\usepackage[localimports=false]{pyluatex}`
 
-Package options (except for `executable` and `shutdown`) can be changed in the document with the
+The package options `verbose` and `ignoreerrors` can be changed in the document with the
 `\pyoption` command, e.g. `\pyoption{verbose}{true}` or `\pyoption{ignoreerrors}{false}`.
 
 ### Macros

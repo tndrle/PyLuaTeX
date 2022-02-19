@@ -14,8 +14,6 @@
 
 \begin{document}
 
-\ifdefined\TestAll
-
 % simple tests
 \py{1 + 3}
 
@@ -113,6 +111,11 @@ print(_a)
 \pyc{1 / 0}
 \pyoption{ignoreerrors}{false}
 
-\fi
+% default for localimports is true
+\begin{python}
+import sys
+import os
+assert sys.path[0] == os.path.join(os.getcwd(), 'test-cases')
+\end{python}
 
 \end{document}

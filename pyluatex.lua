@@ -31,6 +31,8 @@ pyluatex = pyluatex or {
     session = "default"
 }
 
+local dir_sep = package.config:sub(1,1)
+
 -- status.filename: path to pyluatex.sty
 local folder = file.pathpart(file.collapsepath(status.filename, true))
 local tcp = nil
@@ -43,6 +45,23 @@ local env_repl_mode = false
 local last_code = nil
 local last_output = nil
 
+local function get_tex_file()
+    for k, v in ipairs(arg) do
+        if not v:find("^%-") then
+            local path = lfs.currentdir() .. dir_sep .. v
+            if lfs.attributes(path, "mode") == "file" then
+                return path
+            else
+                path = path .. ".tex"
+                if lfs.attributes(path, "mode") == "file" then
+                    return path
+                end
+            end
+        end
+    end
+    return nil
+end
+
 local function trim(s)
     return (s:gsub("^%s*(.-)%s*$", "%1"))
 end
@@ -51,14 +70,22 @@ local function err_cmd(message)
     return "\\PackageError{PyLuaTeX}{" .. message .. "}{}"
 end
 
-function pyluatex.start(executable)
+function pyluatex.start(executable, local_imports)
     local script = file.join(folder, "pyluatex-interpreter.py")
-    local is_windows = package.config:sub(1,1) ~= "/"
-    local cmd
+    local is_windows = dir_sep ~= "/"
+
+    local cmd = ""
+    if local_imports then
+        local tex_file = get_tex_file()
+        if tex_file ~= nil then
+            cmd = " \"" .. tex_file .. "\""
+        end
+    end
+    cmd = executable .. " \"" .. script .. "\"" .. cmd
     if is_windows then
-        cmd = "start /B " .. executable .. " \"" .. script .. "\""
+        cmd = "start /B " .. cmd
     else
-        cmd = executable .. " \"" .. script .. "\" &"
+        cmd = cmd .. " &"
     end
     local f = io.popen(cmd, "r")
     local port = f:read("*l")
