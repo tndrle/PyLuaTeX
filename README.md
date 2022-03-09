@@ -69,31 +69,11 @@ The folder `example` contains additional example documents:
 * `typesetting-minted.tex`  
   A detailed example for typesetting code and output with the *minted* package
 
-For more intricate use cases have a look at our tests in the folder `test`.
-
 ## Installation
 PyLuaTeX is available in TeX Live, MiKTeX, and on [CTAN](https://ctan.org/pkg/pyluatex) as `pyluatex`.
 
 To install PyLuaTeX in **TeX Live** run `tlmgr install pyluatex`.  
 In **MiKTeX**, PyLuaTeX can be installed in the *MiKTeX Console*.
-
-To install PyLuaTeX **manually**, do the following steps:
-1. Locate your local *TEXMF* folder  
-The location of this folder may vary. Typical defaults for TeX Live are `~/texmf` for Linux,
-`~/Library/texmf` for macOS, and `C:\Users\<user name>\texmf` for Windows.
-If you are lucky, the command `kpsewhich -var-value=TEXMFHOME` tells you the location.
-For MiKTeX, the folder can be found and configured in the *MiKTeX Console*.
-2. Download the [latest release](https://github.com/tndrle/PyLuaTeX/releases/latest) of PyLuaTeX
-3. Put the downloaded files in the folder `TEXMF/tex/latex/pyluatex` (where `TEXMF` is the folder located in 1.)  
-The final folder structure must be
-```
-TEXMF/tex/latex/pyluatex/
-├── pyluatex-interpreter.py
-├── pyluatex-json.lua
-├── pyluatex.lua
-├── pyluatex.sty
-├── ...
-```
 
 ## Reference
 PyLuaTeX offers a simple set of options, macros and environments.
@@ -105,9 +85,6 @@ This is helpful if you want to process code or output further and do your own ty
 For an example, see the [Typesetting Code](#typesetting-code) section.
 
 ### Package Options
-* `verbose`  
-  If this option is set, Python input and output is written to the LaTeX log file.  
-  *Example:* `\usepackage[verbose]{pyluatex}`
 * `executable`  
   Specifies the path to the Python executable. (default: `python3`)  
   *Example:* `\usepackage[executable=/usr/local/bin/python3]{pyluatex}`
@@ -115,14 +92,17 @@ For an example, see the [Typesetting Code](#typesetting-code) section.
   By default, PyLuaTeX aborts the compilation process when Python reports an error.
   If the `ignoreerrors` option is set, the compilation process is not aborted.  
   *Example:* `\usepackage[ignoreerrors]{pyluatex}`
+* `localimports`  
+  If this option is set, the folder containing the TeX input file is added to the Python path. This allows local Python packages to be imported. (default: `true`)  
+  *Example:* `\usepackage[localimports=false]{pyluatex}`
 * `shutdown`  
   Specifies when the Python process is shut down. (default: `veryveryend`)  
   *Options:* `veryveryend`, `veryenddocument`, `off`  
   PyLuaTeX uses the hooks of the package *atveryend* to shut down the Python interpreter when the compilation is done. With the option `veryveryend`, Python is shut down in the `\AtVeryVeryEnd` hook. With the option `veryenddocument`, Python is shut down in the `\AtVeryEndDocument` hook. With the option `off`, Python is not shut down explicitly. However, the Python process will shut down when the LuaTeX process finishes even if `off` is selected. Using `off` on Windows might lead to problems with SyncTeX, though.  
   *Example:* `\usepackage[shutdown=veryenddocument]{pyluatex}`
-* `localimports`  
-  If this option is set, the folder containing the TeX input file is added to the Python path. This allows local Python packages to be imported. (default: `true`)  
-  *Example:* `\usepackage[localimports=false]{pyluatex}`
+* `verbose`  
+  If this option is set, Python input and output is written to the LaTeX log file.  
+  *Example:* `\usepackage[verbose]{pyluatex}`
 
 The package options `verbose` and `ignoreerrors` can be changed in the document with the
 `\pyoption` command, e.g. `\pyoption{verbose}{true}` or `\pyoption{ignoreerrors}{false}`.
