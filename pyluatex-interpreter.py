@@ -107,9 +107,7 @@ class Handler(socketserver.StreamRequestHandler):
 
 if __name__ == '__main__':
     try:
-        tex_file = sys.argv[1]
-        tex_file_folder = os.path.normpath(os.path.dirname(tex_file))
-        sys.path.insert(0, tex_file_folder)
+        sys.path.insert(0, os.path.normpath(sys.argv[1]))
     except:
         pass
 

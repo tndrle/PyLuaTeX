@@ -45,16 +45,16 @@ local env_repl_mode = false
 local last_code = nil
 local last_output = nil
 
-local function get_tex_file()
+local function get_tex_file_folder()
     for k, v in ipairs(arg) do
         if not v:find("^%-") then
-            local path = lfs.currentdir() .. dir_sep .. v
-            if lfs.attributes(path, "mode") == "file" then
-                return path
+            local path = file.collapsepath(v, true)
+            if lfs.isfile(path) then
+                return file.pathpart(path)
             else
-                path = path .. ".tex"
-                if lfs.attributes(path, "mode") == "file" then
-                    return path
+                path = file.addsuffix(path, "tex")
+                if lfs.isfile(path) then
+                    return file.pathpart(path)
                 end
             end
         end
@@ -76,9 +76,9 @@ function pyluatex.start(executable, local_imports)
 
     local cmd = ""
     if local_imports then
-        local tex_file = get_tex_file()
-        if tex_file ~= nil then
-            cmd = " \"" .. tex_file .. "\""
+        local tex_file_folder = get_tex_file_folder()
+        if tex_file_folder ~= nil then
+            cmd = " \"" .. tex_file_folder .. "\""
         end
     end
     cmd = executable .. " \"" .. script .. "\"" .. cmd

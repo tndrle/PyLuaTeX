@@ -32,12 +32,14 @@ is_windows = platform.system() == 'Windows'
 lualatex = 'lualatex.exe' if is_windows else 'lualatex'
 failure = False
 
-def _run(file, test, expectSuccess):
+def _run(file, test, expectSuccess, absPath):
     global failure
     name = file if test is None else f'{file} {test}'
     print(f'#### Running test "{name}"')
 
     path = f'test-cases/{file}.tex'
+    if absPath:
+        path = os.path.abspath(path)
     cmd = path if test is None else r'\def\Test' + test + r'{1}\input{' + path + '}'
     result = subprocess.run(
         [lualatex, '-shell-escape', '--interaction=nonstopmode', cmd],
@@ -57,12 +59,13 @@ def _run(file, test, expectSuccess):
             print('#### Stderr:')
             print(result.stderr.decode('utf-8'))
 
-def assertSucceeds(file, test):
-    _run(file, test, True)
+def assertSucceeds(file, test, absPath=False):
+    _run(file, test, True, absPath)
 
-def assertFails(file, test):
-    _run(file, test, False)
+def assertFails(file, test, absPath=False):
+    _run(file, test, False, absPath)
 
+assertSucceeds('local-imports-true', None, True)
 assertSucceeds('local-imports-true', None)
 assertSucceeds('local-imports-false', None)
 assertSucceeds('succeeding', None)
