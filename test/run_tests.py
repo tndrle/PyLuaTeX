@@ -32,13 +32,13 @@ is_windows = platform.system() == 'Windows'
 lualatex = 'lualatex.exe' if is_windows else 'lualatex'
 failure = False
 
-def _run(file, test, expectSuccess, absPath):
+def _run(file, test, expect_success, abs_path):
     global failure
     name = file if test is None else f'{file} {test}'
-    print(f'#### Running test "{name}"')
+    print(f'#### Running test "{name}" (abs path: {abs_path})')
 
     path = f'test-cases/{file}.tex'
-    if absPath:
+    if abs_path:
         path = os.path.abspath(path)
     cmd = path if test is None else r'\def\Test' + test + r'{1}\input{' + path + '}'
     result = subprocess.run(
@@ -46,9 +46,9 @@ def _run(file, test, expectSuccess, absPath):
         capture_output=True)
     success = result.returncode == 0
 
-    if expectSuccess != success:
+    if expect_success != success:
         failure = True
-        if expectSuccess:
+        if expect_success:
             print(f'#### Test "{name}" was expected to succeed but failed')
         else:
             print(f'#### Test "{name}" was expected to fail but succeeded')
@@ -59,24 +59,24 @@ def _run(file, test, expectSuccess, absPath):
             print('#### Stderr:')
             print(result.stderr.decode('utf-8'))
 
-def assertSucceeds(file, test, absPath=False):
-    _run(file, test, True, absPath)
+def assert_succeeds(file, test, abs_path=False):
+    _run(file, test, True, abs_path)
 
-def assertFails(file, test, absPath=False):
-    _run(file, test, False, absPath)
+def assert_fails(file, test, abs_path=False):
+    _run(file, test, False, abs_path)
 
-assertSucceeds('local-imports-true', None, True)
-assertSucceeds('local-imports-true', None)
-assertSucceeds('local-imports-false', None)
-assertSucceeds('succeeding', None)
-assertFails('failing', 'VariableNotDefined')
-assertFails('failing', 'CodeOnFirstLine')
-assertFails('failing', 'InvalidIndentation')
-assertFails('failing', 'WrongSession')
-assertFails('failing', 'NoMultiline')
-assertFails('failing', 'AllOnOneLine')
-assertFails('failing-beamer', 'FrameNotFragile')
-assertSucceeds('succeeding-beamer', 'All')
+assert_succeeds('local-imports-true', None, True)
+assert_succeeds('local-imports-true', None)
+assert_succeeds('local-imports-false', None)
+assert_succeeds('succeeding', None)
+assert_fails('failing', 'VariableNotDefined')
+assert_fails('failing', 'CodeOnFirstLine')
+assert_fails('failing', 'InvalidIndentation')
+assert_fails('failing', 'WrongSession')
+assert_fails('failing', 'NoMultiline')
+assert_fails('failing', 'AllOnOneLine')
+assert_fails('failing-beamer', 'FrameNotFragile')
+assert_succeeds('succeeding-beamer', 'All')
 
 print(f'#### Running SyncTeX test')
 file = 'test-cases/synctex-simple.tex'
