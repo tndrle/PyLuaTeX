@@ -36,7 +36,7 @@ $\sqrt{371} = \py{math.sqrt(371)}$
 ```
 **Note:** PyLuaTeX starts Python 3 using the command `python3` by default.
 If `python3` does not start Python 3 on your system, find the correct command
-and replace `\usepackage{pyluatex}` with `\usepackage[executable={your python command}]{pyluatex}`.
+and replace `\usepackage{pyluatex}` with `\usepackage[executable=<your python command>]{pyluatex}`.
 For example, `\usepackage[executable=python.exe]{pyluatex}`.
 
 2. Compile using LuaLaTeX (shell escape is required)
@@ -108,32 +108,35 @@ The package options `verbose` and `ignoreerrors` can be changed in the document 
 `\pyoption` command, e.g. `\pyoption{verbose}{true}` or `\pyoption{ignoreerrors}{false}`.
 
 ### Macros
-* `\py{code}`  
-  Executes (object-like) `code` and writes its string representation to the document.  
+* `\py{<code>}`  
+  Executes (object-like) `<code>` and writes its string representation to the document.  
   *Example:* `\py{3 + 7}`
-* `\pyq{code}`  
-  Executes (object-like) `code`. Any output is suppressed.  
+* `\pyq{<code>}`  
+  Executes (object-like) `<code>`. Any output is suppressed.  
   *Example:* `\pyq{3 + 7}`
-* `\pyc{code}`  
-  Executes `code`. Output (e.g. from a call to `print()`) is written to the document.  
+* `\pyc{<code>}`  
+  Executes `<code>`. Output (e.g. from a call to `print()`) is written to the document.  
   *Examples:* `\pyc{x = 5}`, `\pyc{print('hello')}`
-* `\pycq{code}`  
-  Executes `code`. Any output is suppressed.  
+* `\pycq{<code>}`  
+  Executes `<code>`. Any output is suppressed.  
   *Example:* `\pycq{x = 5}`
-* `\pyfile{path}`  
-  Executes the Python file specified by `path`. Output (e.g. from a call to `print()`) is written to the document.  
+* `\pyfile{<path>}`  
+  Executes the Python file specified by `<path>`. Output (e.g. from a call to `print()`) is written to the document.  
   *Example:* `\pyfile{main.py}`
-* `\pyfileq{path}`  
-  Executes the Python file specified by `path`. Any output is suppressed.  
+* `\pyfileq{<path>}`  
+  Executes the Python file specified by `<path>`. Any output is suppressed.  
   *Example:* `\pyfileq{main.py}`
-* `\pysession{session}`  
-  Selects `session` as Python session for subsequent Python code.  
+* `\pysession{<session>}`  
+  Selects `<session>` as Python session for subsequent Python code.  
   The session that is active at the beginning is `default`.  
   *Example:* `\pysession{main}`
-* `\pyoption{option}{value}`  
-  Assigns `value` to the package option `option` anywhere in the document. For more information consider
+* `\pyoption{<option>}{<value>}`  
+  Assigns `<value>` to the package option `<option>` anywhere in the document. For more information consider
   the [Package Options](#package-options) section.  
   *Example:* `\pyoption{verbose}{true}`
+* `\pyif{<test>}{<then clause>}{<else clause>}`  
+  Evaluates the Python boolean expression `<test>`, and then executes either the LaTeX code in `<then clause>` or the LaTeX code in `<else clause>`.  
+  *Example:* `\pyif{a == 1}{$a = 1$}{$a \neq 1$}`
 
 ### Environments
 * `python`  
@@ -170,8 +173,8 @@ in your environment definition, e.g.
 * Python 3
 * Linux, macOS or Windows
 
-Our automated tests currently use TeX Live 2021 and Python 3.7+ on
-Ubuntu 20.04, macOS Big Sur 11 and Windows Server 2019.
+The automated tests currently use TeX Live 2022 and Python 3.8+ on
+Ubuntu 20.04, macOS Big Sur 11 and Windows Server 2022.
 
 ## Typesetting Code
 Sometimes, in addition to having Python code executed and the output written to your document, you also want to show the code itself in your document.
