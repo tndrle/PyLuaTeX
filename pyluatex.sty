@@ -66,7 +66,7 @@
 
 \newenvironment{pythonrepl}{\directlua{pyluatex.record_env("pythonrepl", true)}}{}
 
-\newcommand*{\pyluatex@inline}[3]{\directlua{pyluatex.execute([==[#1]==], #2, #3, false)}}
+\newcommand*{\pyluatex@inline}[3]{\directlua{pyluatex.execute([==[#1]==], #2, #3, false, true)}}
 
 \newcommand*{\py}[1]{\pyluatex@inline{#1}{true}{true}}
 \newcommand*{\pyq}[1]{\pyluatex@inline{#1}{true}{false}}
@@ -80,5 +80,12 @@
 \newcommand*{\pyfile}[1]{\directlua{pyluatex.run_file([==[#1]==], true, false)}}
 \newcommand*{\pyfileq}[1]{\directlua{pyluatex.run_file([==[#1]==], false, false)}}
 \newcommand*{\pyfilerepl}[1]{\directlua{pyluatex.run_file([==[#1]==], false, true)}}
+
+\newcommand*{\pyif}[1]{%
+    \ifnum1=\directlua{pyluatex.execute([==['1' if (#1) else '0']==], true, true, false, false)}\relax
+        \expandafter\@firstoftwo
+    \else
+        \expandafter\@secondoftwo
+    \fi}
 
 \endinput

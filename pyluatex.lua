@@ -141,7 +141,7 @@ local function split_lines(str)
     return t
 end
 
-function pyluatex.execute(code, auto_print, write, repl_mode)
+function pyluatex.execute(code, auto_print, write, repl_mode, store)
     local full_code
     if auto_print then
         full_code = "print(str(" .. code .. "), end='')"
@@ -159,14 +159,17 @@ function pyluatex.execute(code, auto_print, write, repl_mode)
             ignore_errors = pyluatex.ignore_errors
         }
     )
-    last_code = split_lines(code)
-    last_output = split_lines(output)
+    local output_lines = split_lines(output)
+    if store then
+        last_code = split_lines(code)
+        last_output = output_lines
+    end
 
     if success or pyluatex.ignore_errors then
         if pyluatex.verbose or not success then log_output(output) end
 
         if write then
-            tex.print(last_output)
+            tex.print(output_lines)
         end
     else
         if not pyluatex.verbose then log_input(full_code) end
@@ -195,7 +198,7 @@ local function record_line(line)
             table.insert(env_lines, code_in_line)
         end
         local code = table.concat(env_lines, "\n")
-        local success = pyluatex.execute(code, false, false, env_repl_mode)
+        local success = pyluatex.execute(code, false, false, env_repl_mode, true)
         if success or pyluatex.ignore_errors then
             return line:sub(s)
         else
@@ -235,7 +238,7 @@ function pyluatex.run_file(path, write, repl_mode)
         elseif code:sub(-1) == "\n" then
             code = code:sub(0, -2)
         end
-        pyluatex.execute(code, false, write, repl_mode)
+        pyluatex.execute(code, false, write, repl_mode, true)
     else
         tex.sprint(err_cmd("File not found: " .. path))
     end

@@ -118,4 +118,11 @@ import os
 assert sys.path[0] == os.path.join(os.getcwd(), 'test-cases')
 \end{python}
 
+% conditional
+\begin{python}
+a = 7
+\end{python}
+\pyif{a == 7}{\begin{center} a \end{center}}{a \par b}
+\pyif{a == 8}{\begin{center} a \end{center}}{a \par b}
+
 \end{document}
