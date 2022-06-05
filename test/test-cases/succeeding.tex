@@ -119,11 +119,16 @@ assert sys.path[0] == os.path.join(os.getcwd(), 'test-cases')
 \end{python}
 
 % conditional
-\begin{python}
+\begin{pythonq}
 a = 7
-\end{python}
+print('x')
+\end{pythonq}
 \pyif{a == 7}{\begin{center} a \end{center}}{a \par b}
 \pyif{a == 8}{\begin{center} a \end{center}}{a \par b}
 \pyif{a == 1}{$a = 1$}{$a \neq 1$}
+\directlua{
+    if not (pyluatex.get_last_code()[1] == "a = 7") then tex.error("test failed") end
+    if not (pyluatex.get_last_output()[1] == "x") then tex.error("test failed") end
+}
 
 \end{document}

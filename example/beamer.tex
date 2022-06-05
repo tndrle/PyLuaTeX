@@ -8,7 +8,7 @@
 %% and version 1.3c or later is part of all distributions of LaTeX
 %% version 2005/12/01 or later.
 
-\documentclass{beamer}
+\documentclass[t]{beamer}
 
 \usepackage{pyluatex}
 \usepackage{listings}
@@ -64,13 +64,17 @@ end
 %%%%%%%%%%%%%%%%%%%%%% frame
 
 \begin{frame}{Important}
-Using PyLuaTeX environments (\emph{python} or \emph{pythonq}) inside BEAMER frames
-requires the \emph{fragile} option for those frames.
+Using PyLuaTeX environments (\texttt{python}, \texttt{pythonq}, or \texttt{pythonrepl}) inside BEAMER frames
+requires the \texttt{fragile} option for those frames.
+
+\medskip
+If you don't use overlays in a frame, i.e. the frame contains only a single slide,
+you can use the \texttt{fragile=singleslide} option.
 \end{frame}
 
 %%%%%%%%%%%%%%%%%%%%%% frame
 
-\begin{frame}[fragile]{Slide 1}
+\begin{frame}[fragile=singleslide]{Python environment inside frame}
 \begin{pythonq}
 msg = 'Hello slide 1'
 
@@ -96,27 +100,31 @@ msg = 'Hello slide 2'
 print(msg)
 \end{pythonq}
 
-\begin{frame}{Slide 1}
+\begin{frame}{Python environment outside frame}
 \pytypeset
 
-The \emph{fragile} option is not required in this frame because
-the \emph{pythonq} environment is outside the frame.
-Only the macro \emph{\textbackslash pytypeset} for typesetting the code and output is inside
+The \texttt{fragile} option is not required in this frame because
+the \texttt{pythonq} environment is outside the frame.
+Only the macro \texttt{\textbackslash pytypeset} for typesetting the code and output is inside
 the frame.
+
+\medskip
+Inline Python still works: The result of \pyq{17 + 300}$\coderaw$ is \outputraw
 \end{frame}
 
 %%%%%%%%%%%%%%%%%%%%%% frame
 
-\newenvironment{typesetpython}
-    {\PyLTVerbatimEnv\begin{pythonq}}
-    {\end{pythonq}\pytypeset}
-
-\begin{frame}[fragile]{Slide 2}
-\begin{typesetpython}
+\begin{frame}[fragile]{Overlays}
+\begin{pythonq}
 msg = 'Custom environment'
 
 print(msg)
-\end{typesetpython}
+\end{pythonq}
+\pytypeset
+\pause
+
+In this frame, \texttt{fragile} is required instead of \texttt{fragile=singleslide},
+because we use overlays.
 \end{frame}
 
 \end{document}
