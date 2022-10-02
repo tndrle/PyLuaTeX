@@ -1,6 +1,6 @@
 name: Tests
 env:
-  cache-version: v3
+  cache-version: v4
 on: [push]
 jobs:
   tests:
@@ -8,13 +8,22 @@ jobs:
     strategy:
       matrix:
         include:
-          - os: ubuntu-latest
+          - os: ubuntu-20.04
             CACHE_DIR: /tmp/texlive
             BIN_PATH: /tmp/texlive/bin/x86_64-linux
-          - os: macos-latest
+          - os: ubuntu-22.04
+            CACHE_DIR: /tmp/texlive
+            BIN_PATH: /tmp/texlive/bin/x86_64-linux
+          - os: macos-11
             CACHE_DIR: /tmp/texlive
             BIN_PATH: /tmp/texlive/bin/universal-darwin
-          - os: windows-latest
+          - os: macos-12
+            CACHE_DIR: /tmp/texlive
+            BIN_PATH: /tmp/texlive/bin/universal-darwin
+          - os: windows-2019
+            CACHE_DIR: D:\texlive
+            BIN_PATH: D:\texlive\bin\win32
+          - os: windows-2022
             CACHE_DIR: D:\texlive
             BIN_PATH: D:\texlive\bin\win32
     timeout-minutes: 15
@@ -26,8 +35,8 @@ jobs:
         uses: actions/cache@v1
         with:
           path: ${{ matrix.CACHE_DIR }}
-          key: ${{ env.cache-version }}-${{ runner.os }}-env
-          restore-keys: ${{ env.cache-version }}-${{ runner.os }}-env
+          key: ${{ env.cache-version }}-${{ matrix.os }}-env
+          restore-keys: ${{ env.cache-version }}-${{ matrix.os }}-env
       - name: Install TeX Live (Windows)
         if: ${{ steps.cache-env.outputs.cache-hit != 'true' && runner.os == 'Windows' }}
         uses: ./.github/actions/texlive-windows

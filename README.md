@@ -173,8 +173,13 @@ in your environment definition, e.g.
 * Python 3
 * Linux, macOS or Windows
 
-The automated tests currently use TeX Live 2022 and Python 3.8+ on
-Ubuntu 20.04, macOS Big Sur 11 and Windows Server 2022.
+The automated tests currently use TeX Live 2022 on
+* Ubuntu 20.04 with Python 3.8
+* Ubuntu 22.04 with Python 3.10
+* macOS 11 Big Sur with Python 3.10
+* macOS 12 Monterey with Python 3.10
+* Windows Server 2019 with Python 3.7
+* Windows Server 2022 with Python 3.9
 
 ## Typesetting Code
 Sometimes, in addition to having Python code executed and the output written to your document, you also want to show the code itself in your document.
