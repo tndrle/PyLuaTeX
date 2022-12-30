@@ -34,15 +34,17 @@ $\sqrt{371} = \py{math.sqrt(371)}$
 \randint{2}{5}
 \end{document}
 ```
-**Note:** PyLuaTeX starts Python 3 using the command `python3` by default.
-If `python3` does not start Python 3 on your system, find the correct command
-and replace `\usepackage{pyluatex}` with `\usepackage[executable=<your python command>]{pyluatex}`.
-For example, `\usepackage[executable=python.exe]{pyluatex}`.
 
 2. Compile using LuaLaTeX (shell escape is required)
 ```
 lualatex -shell-escape example.tex
 ```
+
+**Note:** PyLuaTeX starts Python 3 using the command `python3` by default.
+If `python3` does not start Python 3 on your system, find the correct command
+and replace `\usepackage{pyluatex}` with `\usepackage[executable=<your python command>]{pyluatex}`.
+For example, `\usepackage[executable=python.exe]{pyluatex}`.
+
 **Note:** Running LaTeX with the shell escape option enabled allows arbitrary code to be
 executed. For this reason, it is recommended to compile trusted documents only.
 
@@ -172,14 +174,6 @@ in your environment definition, e.g.
 * LuaLaTeX
 * Python 3
 * Linux, macOS or Windows
-
-The automated tests currently use TeX Live 2022 on
-* Ubuntu 20.04 with Python 3.8
-* Ubuntu 22.04 with Python 3.10
-* macOS 11 Big Sur with Python 3.10
-* macOS 12 Monterey with Python 3.10
-* Windows Server 2019 with Python 3.7
-* Windows Server 2022 with Python 3.9
 
 ## Typesetting Code
 Sometimes, in addition to having Python code executed and the output written to your document, you also want to show the code itself in your document.
