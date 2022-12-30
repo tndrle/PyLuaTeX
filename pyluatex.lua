@@ -41,6 +41,7 @@ local env_end = nil
 local env_lines = nil
 local parent_env = nil
 local env_repl_mode = false
+local env_success = true
 
 local last_code = nil
 local last_output = nil
@@ -183,7 +184,7 @@ function pyluatex.execute(code, auto_print, write, repl_mode, store)
 end
 
 function pyluatex.print_env()
-    if last_output ~= nil then
+    if last_output ~= nil and (env_success or pyluatex.ignore_errors) then
         tex.print(last_output)
     end
 end
@@ -198,11 +199,10 @@ local function record_line(line)
             table.insert(env_lines, code_in_line)
         end
         local code = table.concat(env_lines, "\n")
-        local success = pyluatex.execute(code, false, false, env_repl_mode, true)
-        if success or pyluatex.ignore_errors then
+        env_success = pyluatex.execute(code, false, false, env_repl_mode, true)
+        if env_success or pyluatex.ignore_errors then
             return line:sub(s)
         else
-            last_output = nil
             return env_end .. err_cmd("Python error (see above)") .. line:sub(e + 1)
         end
     else
