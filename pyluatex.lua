@@ -202,6 +202,7 @@ local function record_line(line)
         if success or pyluatex.ignore_errors then
             return line:sub(s)
         else
+            last_output = nil
             return env_end .. err_cmd("Python error (see above)") .. line:sub(e + 1)
         end
     else
