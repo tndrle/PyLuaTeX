@@ -1,6 +1,6 @@
 name: Tests
 env:
-  cache-version: v4
+  cache-version: v5
 on: [push]
 jobs:
   tests:
@@ -29,10 +29,10 @@ jobs:
     timeout-minutes: 15
     steps:
       - name: Check out repository
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
       - name: Cache environments
         id: cache-env
-        uses: actions/cache@v1
+        uses: actions/cache@v3
         with:
           path: ${{ matrix.CACHE_DIR }}
           key: ${{ env.cache-version }}-${{ matrix.os }}-env
