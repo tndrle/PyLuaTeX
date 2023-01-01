@@ -22,7 +22,7 @@ FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
 IN THE SOFTWARE.
 --]]
 
-local json = require("pyluatex-json")
+require("lualibs-util-jsn")
 local socket = require("socket")
 
 pyluatex = pyluatex or {
@@ -112,13 +112,13 @@ function pyluatex.start(executable, local_imports)
 end
 
 function pyluatex.shutdown()
-    tcp:send(json.encode("shutdown") .. "\n")
+    tcp:send("shutdown\n")
 end
 
 local function request(data)
-    tcp:send(json.encode(data) .. "\n")
+    tcp:send(utilities.json.tostring(data) .. "\n")
     local output = tcp:receive("*l")
-    local response = json.decode(output)
+    local response = utilities.json.tolua(output)
     return response.success, response.output
 end
 

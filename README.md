@@ -241,6 +241,3 @@ No placeholders have to be inserted.
 ## License
 [LPPL 1.3c](http://www.latex-project.org/lppl.txt) for LaTeX code and
 [MIT license](https://opensource.org/licenses/MIT) for Python and Lua code.
-
-We use the great [json.lua](https://github.com/rxi/json.lua) library under the terms
-of the [MIT license](https://opensource.org/licenses/MIT).

@@ -88,11 +88,10 @@ class Handler(socketserver.StreamRequestHandler):
             data = self.rfile.readline().decode('utf-8')
             if len(data) == 0:  # socket closed, LuaTeX process finished
                 return
-
-            data = json.loads(data)
-            if data == 'shutdown':
+            if data.strip() == 'shutdown':
                 return
 
+            data = json.loads(data)
             interpreter = interpreters[data['session']]
             code = textwrap.dedent(data['code'])
             if data['repl_mode']:
