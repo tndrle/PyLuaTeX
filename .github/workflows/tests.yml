@@ -72,14 +72,7 @@ jobs:
       - name: Run examples
         run: |
           cd example
-          lualatex -shell-escape --interaction=nonstopmode data-visualization.tex
-          lualatex -shell-escape --interaction=nonstopmode readme-example.tex
-          lualatex -shell-escape --interaction=nonstopmode sessions.tex
-          lualatex -shell-escape --interaction=nonstopmode matplotlib-external.tex
-          lualatex -shell-escape --interaction=nonstopmode matplotlib-pgf.tex
-          lualatex -shell-escape --interaction=nonstopmode typesetting-example.tex
-          lualatex -shell-escape --interaction=nonstopmode typesetting-listings.tex
-          lualatex -shell-escape --interaction=nonstopmode typesetting-minted.tex
-          lualatex -shell-escape --interaction=nonstopmode readme-custom-env.tex
-          lualatex -shell-escape --interaction=nonstopmode beamer.tex
-          lualatex -shell-escape --interaction=nonstopmode repl.tex
+          for f in *.tex; do
+            lualatex -shell-escape --interaction=nonstopmode $f
+          done
+        shell: bash
