@@ -72,8 +72,8 @@ and \py{df.Time.iloc[-1]}. The red lines mark the current year and population.
     xticklabel style={/pgf/number format/1000 sep=},
     grid=both,
 ]
-\addplot[no marks,black,thick] coordinates {%
-    \py{pgf_coords(world_data.index, world_data.PopTotal / 1e6)}%
+\addplot[no marks,black,thick] coordinates {
+    \py{pgf_coords(world_data.index, world_data.PopTotal / 1e6)}
 };
 \draw[red,thick] (axis cs:\py{year},0) |- (axis cs:0,\py{current_pop / 1e6});
 \end{axis}
@@ -123,9 +123,9 @@ plots = [
     xticklabel style={/pgf/number format/1000 sep=},
     grid=both,
 ]
-\pgfplotsinvokeforeach{0,1}{%
-    \addplot[no marks,black,thick] coordinates {%
-        \py{pgf_coords(plots[#1][1].index, plots[#1][1])}%
+\pgfplotsinvokeforeach{0,1}{
+    \addplot[no marks,black,thick] coordinates {
+        \py{pgf_coords(plots[#1][1].index, plots[#1][1])}
     };
     \node[below] at (axis cs:\py{marker_year},\py{plots[#1][1].loc[marker_year]})
         {\py{plots[#1][0]}};

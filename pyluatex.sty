@@ -13,11 +13,11 @@
 
 \RequirePackage{expl3}
 \ExplSyntaxOn
-\sys_if_engine_luatex:TF{}{%
-    \PackageError{PyLuaTeX}{LuaTeX~is~required}{}%
+\sys_if_engine_luatex:TF{}{
+    \PackageError{PyLuaTeX}{LuaTeX~is~required}{}
 }
-\sys_if_shell_unrestricted:TF{}{%
-    \PackageError{PyLuaTeX}{Shell~escape~required~(add~-shell-escape~option)}{}%
+\sys_if_shell_unrestricted:TF{}{
+    \PackageError{PyLuaTeX}{Shell~escape~required~(add~-shell-escape~option)}{}
 }
 \ExplSyntaxOff
 
@@ -40,18 +40,18 @@
 
 \ExplSyntaxOn
 \cs_generate_variant:Nn \tl_if_eq:nnTF { V }
-\tl_if_eq:VnTF{\pyluatex@shutdown}{veryveryend}{%
+\tl_if_eq:VnTF{\pyluatex@shutdown}{veryveryend}{
     \RequirePackage{atveryend}
     \AtVeryVeryEnd{\directlua{pyluatex.shutdown()}}
-}{%
-    \tl_if_eq:VnTF{\pyluatex@shutdown}{veryenddocument}{%
+}{
+    \tl_if_eq:VnTF{\pyluatex@shutdown}{veryenddocument}{
         \RequirePackage{atveryend}
         \AtVeryEndDocument{\directlua{pyluatex.shutdown()}}
-    }{%
-        \tl_if_eq:VnTF{\pyluatex@shutdown}{off}{}{%
-            \PackageError{PyLuaTeX}{%
+    }{
+        \tl_if_eq:VnTF{\pyluatex@shutdown}{off}{}{
+            \PackageError{PyLuaTeX}{
                 Invalid~value~for~package~option~"shutdown":~\pyluatex@shutdown
-            }{}%
+            }{}
         }
     }
 }
@@ -59,7 +59,7 @@
 
 \newcommand*{\PyLTVerbatimEnv}{\directlua{pyluatex.set_parent_env([==[\@currenvir]==])}}
 
-\newenvironment{python}{\directlua{pyluatex.record_env("python", false)}}%
+\newenvironment{python}{\directlua{pyluatex.record_env("python", false)}}
 {\directlua{pyluatex.print_env()}}
 
 \newenvironment{pythonq}{\directlua{pyluatex.record_env("pythonq", false)}}{}
