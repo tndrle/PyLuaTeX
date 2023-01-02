@@ -266,6 +266,8 @@ local function parse_bool(name, value)
 end
 
 function pyluatex.set_option(name, value)
+    name = trim(name)
+    value = trim(value)
     if name == "ignoreerrors" then
         pyluatex.ignore_errors = parse_bool(name, value)
     elseif name == "verbose" then
