@@ -1,6 +1,6 @@
 name: Tests
 env:
-  cache-version: v5
+  cache-version: v6
 on: [push]
 jobs:
   tests:
@@ -21,14 +21,14 @@ jobs:
       - name: OS switches and PATH
         run: |
           if [ "$RUNNER_OS" == "Linux" ]; then
-            echo "tl-dir=/tmp/texlive" >> $GITHUB_ENV
-            echo "/tmp/texlive/bin/x86_64-linux" >> $GITHUB_PATH
+            echo "tl-dir=~" >> $GITHUB_ENV
+            echo ~/texlive/bin/x86_64-linux >> $GITHUB_PATH
           elif [ "$RUNNER_OS" == "Windows" ]; then
-            echo "tl-dir=D:\texlive" >> $GITHUB_ENV
-            echo "D:\texlive\bin\win32" >> $GITHUB_PATH
+            echo "tl-dir=D:" >> $GITHUB_ENV
+            echo D:/texlive/bin/win32 >> $GITHUB_PATH
           else
-            echo "tl-dir=/tmp/texlive" >> $GITHUB_ENV
-            echo "/tmp/texlive/bin/universal-darwin" >> $GITHUB_PATH
+            echo "tl-dir=~" >> $GITHUB_ENV
+            echo ~/texlive/bin/universal-darwin >> $GITHUB_PATH
           fi
         shell: bash
       - uses: actions/checkout@v3
@@ -42,15 +42,14 @@ jobs:
         id: tl-env
         with:
           path: |
-            ${{ env.tl-dir }}
-            ~/texmf
+            ${{ env.tl-dir }}/texlive
+            ${{ env.tl-dir }}/texmf
           key: ${{ env.cache-version }}-${{ matrix.os }}-env
-      - name: Install TeX Live (Windows)
-        if: ${{ steps.tl-env.outputs.cache-hit != 'true' && runner.os == 'Windows' }}
-        uses: ./.github/actions/texlive-windows
-      - name: Install TeX Live (Unix)
-        if: ${{ steps.tl-env.outputs.cache-hit != 'true' && runner.os != 'Windows' }}
-        uses: ./.github/actions/texlive-unix
+      - name: Install TeX Live
+        if: steps.tl-env.outputs.cache-hit != 'true'
+        uses: ./.github/actions/texlive-install
+        with:
+          dir: ${{ env.tl-dir }}
       - name: Install LaTeX dependencies
         if: steps.tl-env.outputs.cache-hit != 'true'
         run: |
@@ -61,9 +60,9 @@ jobs:
           tlmgr remove pyluatex || true
       - name: Copy repository to LaTeX package folder
         run: |
-          rm -rf ~/texmf/tex/latex/pyluatex
-          mkdir -p ~/texmf/tex/latex/pyluatex
-          cp -r . ~/texmf/tex/latex/pyluatex/
+          rm -rf ${{ env.tl-dir }}/texmf/tex/latex/pyluatex
+          mkdir -p ${{ env.tl-dir }}/texmf/tex/latex/pyluatex
+          cp -r . ${{ env.tl-dir }}/texmf/tex/latex/pyluatex/
         shell: bash
       - name: Run tests
         run: |

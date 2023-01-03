@@ -1,0 +1,10 @@
+selected_scheme scheme-small
+TEXDIR %%INST%%/texlive
+TEXMFCONFIG %%INST%%/.texlive/texmf-config
+TEXMFHOME %%INST%%/texmf
+TEXMFLOCAL %%INST%%/texlive/texmf-local
+TEXMFSYSCONFIG %%INST%%/texlive/texmf-config
+TEXMFSYSVAR %%INST%%/texlive/texmf-var
+TEXMFVAR %%INST%%/.texlive/texmf-var
+option_doc 0
+option_src 0
