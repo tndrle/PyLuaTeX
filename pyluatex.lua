@@ -118,8 +118,7 @@ end
 local function request(data)
     tcp:send(utilities.json.tostring(data) .. "\n")
     local output = tcp:receive("*l")
-    local response = utilities.json.tolua(output)
-    return response.success, response.output
+    return utilities.json.tolua(output)
 end
 
 local function log_input(code)
@@ -152,7 +151,7 @@ function pyluatex.execute(code, auto_print, write, repl_mode, store)
 
     if pyluatex.verbose then log_input(full_code) end
 
-    local success, output = request(
+    local resp = request(
         {
             session = pyluatex.session,
             code = full_code,
@@ -160,27 +159,29 @@ function pyluatex.execute(code, auto_print, write, repl_mode, store)
             ignore_errors = pyluatex.ignore_errors
         }
     )
-    local output_lines = split_lines(output)
+    local output_lines = split_lines(resp.output)
     if store then
         last_code = split_lines(code)
         last_output = output_lines
     end
 
-    if success or pyluatex.ignore_errors then
-        if pyluatex.verbose or not success then log_output(output) end
+    if resp.success or pyluatex.ignore_errors then
+        if pyluatex.verbose or not resp.success then log_output(resp.output) end
 
         if write then
             tex.print(output_lines)
         end
     else
         if not pyluatex.verbose then log_input(full_code) end
-        log_output(output)
+        log_output(resp.output)
         if write then
             tex.sprint(err_cmd("Python error (see above)"))
         end
     end
 
-    return success
+    if resp.log_msg ~= "" then texio.write(resp.log_msg) end
+
+    return resp.success
 end
 
 function pyluatex.print_env()

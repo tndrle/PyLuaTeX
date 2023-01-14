@@ -170,6 +170,21 @@ in your environment definition, e.g.
 {\end{python}}
 ```
 
+### Logging from Python
+```python
+tex.log(*objects, sep=' ', end='\n')
+```
+Writes `objects` to the TeX log, separated by `sep` and followed by `end`.
+All elements in `objects` are converted to strings using `str()`.
+Both `sep` and `end` must be strings.
+
+*Example:*
+```latex
+\begin{python}
+tex.log('This text goes to the TeX log.')
+\end{python}
+```
+
 ## Requirements
 * LuaLaTeX
 * Python 3

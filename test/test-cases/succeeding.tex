@@ -131,4 +131,15 @@ print('x')
     if not (pyluatex.get_last_output()[1] == "x") then tex.error("test failed") end
 }
 
+% logging
+\begin{python}
+tex.log('test', 1, {}, [])
+\end{python}
+\begin{pythonq}
+tex.log('test', 1, {}, [])
+\end{pythonq}
+\py{tex.log('test', 1, {}, [])}
+\pyc{tex.log()}
+\pyc{tex.log('test', 1, {}, [], sep='-', end=' ')}
+
 \end{document}
