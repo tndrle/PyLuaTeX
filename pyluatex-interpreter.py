@@ -82,7 +82,7 @@ class Interpreter(InteractiveInterpreter):
                     self.success = False
                 output += out.getvalue()
             if not ignore_errors and not self.success:
-                return False, output
+                return False, output, self.tex._log_message()
         return self.success, output, self.tex._log_message()
 
     def execute(self, code):
