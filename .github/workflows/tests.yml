@@ -16,7 +16,7 @@ jobs:
             windows-2019,
             windows-2022,
           ]
-    timeout-minutes: 15
+    timeout-minutes: 25
     steps:
       - name: OS switches and PATH
         run: |
@@ -25,7 +25,7 @@ jobs:
             echo ~/texlive/bin/x86_64-linux >> $GITHUB_PATH
           elif [ "$RUNNER_OS" == "Windows" ]; then
             echo "tl-dir=D:" >> $GITHUB_ENV
-            echo D:/texlive/bin/win32 >> $GITHUB_PATH
+            echo D:/texlive/bin/windows >> $GITHUB_PATH
           else
             echo "tl-dir=~" >> $GITHUB_ENV
             echo ~/texlive/bin/universal-darwin >> $GITHUB_PATH
