@@ -26,10 +26,28 @@ import sys
 import subprocess
 import platform
 import os
+import re
 
 is_windows = platform.system() == 'Windows'
-
 lualatex = 'lualatex.exe' if is_windows else 'lualatex'
+base_cmds = [lualatex, '-shell-escape', '--interaction=nonstopmode']
+
+# ensure that the correct version is tested
+with open('../pyluatex.sty') as file:
+    content = file.read()
+version = re.search(r'\\ProvidesPackage{pyluatex}\[\d{4}/\d{2}/\d{2} (v[\d.]+)', content).group(1)
+output = subprocess.run(
+        [*base_cmds, r'\listfiles\documentclass{article}\usepackage{pyluatex}\document\enddocument'],
+        capture_output=True).stdout.decode('utf-8')
+output = output[output.index('*File List*'):]
+installed_version = re.search(r'pyluatex\.sty\s+\d{4}/\d{2}/\d{2} (v[\d.]+)', output).group(1)
+if version != installed_version:
+    print('#### Installed version != most recent version')
+    print('Most recent:', version)
+    print('Installed:', installed_version)
+    sys.exit(1)
+
+
 failure = False
 
 def _run(file, test, expect_success, abs_path):
@@ -41,9 +59,7 @@ def _run(file, test, expect_success, abs_path):
     if abs_path:
         path = os.path.abspath(path)
     cmd = path if test is None else r'\def\Test' + test + r'{1}\input{' + path + '}'
-    result = subprocess.run(
-        [lualatex, '-shell-escape', '--interaction=nonstopmode', cmd],
-        capture_output=True)
+    result = subprocess.run([*base_cmds, cmd], capture_output=True)
     success = result.returncode == 0
 
     if expect_success != success:
@@ -80,10 +96,7 @@ assert_succeeds('succeeding-beamer', 'All')
 
 print(f'#### Running SyncTeX test')
 file = 'test-cases/synctex-simple.tex'
-subprocess.run(
-    [lualatex, '-shell-escape', '--interaction=nonstopmode', '-synctex=1', file],
-    capture_output=True
-)
+subprocess.run([*base_cmds, '-synctex=1', file], capture_output=True)
 if os.path.isfile('synctex-simple.synctex(busy)'):
     print('#### *.synctex(busy) file present')
     failure = True
