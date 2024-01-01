@@ -1,25 +1,25 @@
-name: "TeX Live Install"
-description: "Installs TeX Live on Windows or *nix-based systems"
+name: TeX Live Install
+description: Installs TeX Live on Windows or *nix-based systems
 inputs:
   dir:
-    description: "Installation directory"
+    description: Installation directory
     required: true
 runs:
-  using: "composite"
+  using: composite
   steps:
-    - run: |
-        curl -s -O -L http://mirror.ctan.org/systems/texlive/tlnet/install-tl.zip
-        unzip -q install-tl.zip
-        rm install-tl.zip
-        mv install-tl* install-tl
-        INST_DIR=${{ inputs.dir }}  # expand ~ to abs. path on Linux and MacOS
-        sed "s|%%INST%%|${INST_DIR}|" $GITHUB_ACTION_PATH/tl.profile_tmpl > tl.profile
-      shell: bash
-    - if: ${{ runner.os == 'Windows' }}
-      run: install-tl\install-tl-windows.bat --profile tl.profile
-      shell: cmd
-    - if: ${{ runner.os != 'Windows' }}
-      run: install-tl/install-tl -profile tl.profile
-      shell: bash
-    - run: rm -rf install-tl tl.profile
-      shell: bash
+  - run: |
+      curl -s -O -L http://mirror.ctan.org/systems/texlive/tlnet/install-tl.zip
+      unzip -q install-tl.zip
+      rm install-tl.zip
+      mv install-tl* install-tl
+      INST_DIR=${{ inputs.dir }}  # expand ~ to abs. path on Linux and MacOS
+      sed "s|%%INST%%|${INST_DIR}|" $GITHUB_ACTION_PATH/tl.profile_tmpl > tl.profile
+    shell: bash
+  - if: ${{ runner.os == 'Windows' }}
+    run: install-tl\install-tl-windows.bat --profile tl.profile
+    shell: cmd
+  - if: ${{ runner.os != 'Windows' }}
+    run: install-tl/install-tl --profile tl.profile
+    shell: bash
+  - run: rm -rf install-tl tl.profile
+    shell: bash

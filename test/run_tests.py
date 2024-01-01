@@ -25,94 +25,125 @@ IN THE SOFTWARE.
 import sys
 import subprocess
 import platform
-import os
+from pathlib import Path
 import re
+import yaml
+from pdfminer.high_level import extract_text
+from pdfminer.layout import LAParams
 
-is_windows = platform.system() == 'Windows'
-lualatex = 'lualatex.exe' if is_windows else 'lualatex'
-base_cmds = [lualatex, '-shell-escape', '--interaction=nonstopmode']
+test_cases_folder = Path('test-cases')
 
-# ensure that the correct version is tested
-with open('../pyluatex.sty') as file:
-    content = file.read()
-version = re.search(r'\\ProvidesPackage{pyluatex}\[\d{4}/\d{2}/\d{2} (v[\d.]+)', content).group(1)
-output = subprocess.run(
-        [*base_cmds, r'\listfiles\documentclass{article}\usepackage{pyluatex}\document\enddocument'],
-        capture_output=True).stdout.decode('utf-8')
-output = output[output.index('*File List*'):]
-installed_version = re.search(r'pyluatex\.sty\s+\d{4}/\d{2}/\d{2} (v[\d.]+)', output).group(1)
-if version != installed_version:
-    print('#### Installed version != most recent version')
-    print('Most recent:', version)
-    print('Installed:', installed_version)
-    sys.exit(1)
+template_cache = {}
+
+def get_cached_template(filename):
+  if filename not in template_cache:
+    template_cache[filename] = (test_cases_folder / filename).read_text(encoding='utf-8')
+  return template_cache[filename]
+
+def read_pdf(filename):
+    try:
+      return extract_text(filename, laparams=LAParams(char_margin=100)).strip('\n\x0c')
+    except FileNotFoundError:
+      return None
+
+def stripped(value):
+  """
+  Converts a non-None value to its string representation and strips whitespace
+  >>> stripped(None)
+  >>> stripped('test')
+  'test'
+  >>> stripped(' test ')
+  'test'
+  >>> stripped(5)
+  '5'
+  """
+  return None if value is None else str(value).strip()
+
+class Test:
+  temp_stem = '__temp'
+  is_windows = platform.system() == 'Windows'
+  lualatex = 'lualatex.exe' if is_windows else 'lualatex'
+  base_cmds = [lualatex, '--shell-escape', '--interaction=nonstopmode']
+
+  def __init__(self, file_data, data):
+    def get_prop(name, default=None):
+      # test-scoped properties have priority over file-scoped properties
+      return data.get(name, file_data.get(name, default))
+
+    self.template = get_prop('template', 'article_template.tex')
+    self.code = get_prop('code')
+    assert self.code is not None
+    self.expect_success = get_prop('success', True)
+    assert isinstance(self.expect_success, bool)
+    self.expected_pdf = stripped(get_prop('pdf'))
+    self.expected_log = stripped(get_prop('log'))
+    self.unexpected_log = stripped(get_prop('log_not'))
+    self.args = get_prop('args', '')
+
+  def run(self):
+    for f in Path().glob(f'{self.temp_stem}.*'):
+      f.unlink()
+
+    template = get_cached_template(self.template)
+    Path(f'{self.temp_stem}.tex').write_text(template % (self.args, self.code))
+    result = subprocess.run([*self.base_cmds, self.temp_stem], capture_output=True)
+
+    self.success = result.returncode == 0
+    self.log = Path(f'{self.temp_stem}.log').read_text(encoding='utf-8')
+    self.pdf = read_pdf(f'{self.temp_stem}.pdf')
+
+  def check(self):
+    result = True
+    messages = []
+
+    def fail(message):
+      nonlocal result, messages
+      result = False
+      messages.append(message)
+
+    if self.success != self.expect_success:
+      fail(
+        f'Test was expected to {"succeed" if self.expect_success else "fail"}' + \
+        f' but {"succeeded" if self.success else "failed"}'
+      )
+
+    if self.expected_pdf is not None:
+      if self.pdf is None:
+        fail('No PDF was generated')
+      else:
+        if self.pdf != self.expected_pdf:
+          fail('PDF content not as expected')
+
+    if self.expected_log is not None and self.expected_log not in self.log:
+      fail('Expected log output not found in log file')
+    if self.unexpected_log is not None and self.unexpected_log in self.log:
+      fail('Unexpected log output found in log file')
+
+    if result:
+      return True, None
+    else:
+      data = {
+        'MESSAGE': '\n'.join(messages), 'ARGS': self.args, 'CODE': self.code,
+        'SUCCESS': self.success, 'PDF': self.pdf, 'LOG': self.log
+      }
+      message = '\n'.join(f'### {t}\n{v}' for t, v in data.items()
+                                          if v is not None and v != '')
+      return False, message
+
+def load_tests(file):
+  data = yaml.load(file.read_text(encoding='utf-8'), Loader=yaml.FullLoader)
+  return [Test(data, t) for t in data['tests']]
 
 
-failure = False
+if __name__ == '__main__':
+  overall_result = True
+  for file in test_cases_folder.glob('*.yaml'):
+    for test in load_tests(file):
+      test.run()
+      result, message = test.check()
+      if not result:
+        overall_result = False
+        print('#######################', file)
+        print(message)
 
-def _run(file, test, expect_success, abs_path):
-    global failure
-    name = file if test is None else f'{file} {test}'
-    print(f'#### Running test "{name}" (abs path: {abs_path})')
-
-    path = f'test-cases/{file}.tex'
-    if abs_path:
-        path = os.path.abspath(path)
-    cmd = path if test is None else r'\def\Test' + test + r'{1}\input{' + path + '}'
-    result = subprocess.run([*base_cmds, cmd], capture_output=True)
-    success = result.returncode == 0
-
-    if expect_success != success:
-        failure = True
-        if expect_success:
-            print(f'#### Test "{name}" was expected to succeed but failed')
-        else:
-            print(f'#### Test "{name}" was expected to fail but succeeded')
-        if len(result.stdout) > 0:
-            print('#### Stdout:')
-            print(result.stdout.decode('utf-8'))
-        if len(result.stderr) > 0:
-            print('#### Stderr:')
-            print(result.stderr.decode('utf-8'))
-
-def assert_succeeds(file, test, abs_path=False):
-    _run(file, test, True, abs_path)
-
-def assert_fails(file, test, abs_path=False):
-    _run(file, test, False, abs_path)
-
-assert_succeeds('local-imports-true', None, True)
-assert_succeeds('local-imports-true', None)
-assert_succeeds('local-imports-false', None)
-assert_succeeds('succeeding', None)
-assert_fails('failing', 'VariableNotDefined')
-assert_fails('failing', 'CodeOnFirstLine')
-assert_fails('failing', 'InvalidIndentation')
-assert_fails('failing', 'WrongSession')
-assert_fails('failing', 'NoMultiline')
-assert_fails('failing', 'AllOnOneLine')
-assert_fails('failing-beamer', 'FrameNotFragile')
-assert_succeeds('succeeding-beamer', 'All')
-
-print(f'#### Running SyncTeX test')
-file = 'test-cases/synctex-simple.tex'
-subprocess.run([*base_cmds, '-synctex=1', file], capture_output=True)
-if os.path.isfile('synctex-simple.synctex(busy)'):
-    print('#### *.synctex(busy) file present')
-    failure = True
-if not os.path.isfile('synctex-simple.synctex.gz'):
-    print('#### *.synctex.gz file not present')
-    failure = True
-
-if is_windows:
-    result = subprocess.run(
-        ['wmic', 'process', 'where', "name like '%python%'", 'get', 'commandline'],
-        capture_output=True
-    )
-else:
-    result = subprocess.run(['pgrep', '-ilf', 'python'], capture_output=True)
-if 'pyluatex-interpreter.py' in result.stdout.decode('utf-8').lower():
-    print('#### Python process still running')
-    failure = True
-
-sys.exit(1 if failure else 0)
+  sys.exit(0 if overall_result else 1)

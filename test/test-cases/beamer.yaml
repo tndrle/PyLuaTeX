@@ -1,0 +1,49 @@
+template: beamer_template.tex
+tests:
+- code: |
+    \begin{frame}[fragile]{}
+    \begin{python}
+    print('A')
+    \end{python}
+    \end{frame}
+  pdf: A
+- code: |
+    \begin{luacode}
+    function pytypeset()
+      tex.print("\\begin{lstlisting}[language=Python]")
+      tex.print(pyluatex.get_last_output())
+      tex.print("\\end{lstlisting}")
+    end
+    \end{luacode}
+
+    \newenvironment{pyrepl}
+    {\PyLTVerbatimEnv\begin{pythonrepl}}
+    {\end{pythonrepl}\directlua{pytypeset()}}
+
+    \begin{frame}[fragile]{}
+    \begin{pyrepl}
+    def a():
+      return 'x'
+
+    a()
+    \end{pyrepl}
+    \end{frame}
+  pdf: |
+    >>> def a():
+    ... return 'x'
+    ...
+    >>> a()
+    'x'
+- success: false
+  code: |
+    % option 'fragile' missing
+    \begin{frame}{}
+    \begin{python}
+    print('A')
+    \end{python}
+    \end{frame}
+- code: |
+    \begin{frame}{}
+    \py{4}
+    \end{frame}
+  pdf: 4

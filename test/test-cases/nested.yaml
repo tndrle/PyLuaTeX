@@ -1,0 +1,11 @@
+tests:
+- code: |
+    % 1. python environment is executed and prints '\py{_a}'
+    % 2. \py{_a} is executed and prints '9'
+    \begin{python}
+    _a = 9
+    print(r'\py{_a}')
+    \end{python}
+  pdf: 9
+- code: \py{10 * \py{2 * \py{1 + 1}}}
+  pdf: 40

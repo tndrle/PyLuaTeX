@@ -1,0 +1,22 @@
+tests:
+- code: |
+    \newenvironment{derivedenvA}
+    {\PyLTVerbatimEnv Before \begin{python}}{\end{python} After}
+
+    \begin{derivedenvA}
+    _a = 1
+    print(_a)
+    \end{derivedenvA}
+
+    \newenvironment{derivedenvB}
+    {\PyLTVerbatimEnv Before \begin{derivedenvA}}{\end{derivedenvA} After}
+
+    \begin{derivedenvB}
+    _a = 2
+    print(_a)
+    \end{derivedenvB}
+  pdf: |
+    Before
+    1 After
+    Before Before
+    2 After After

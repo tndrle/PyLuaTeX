@@ -1,0 +1,23 @@
+tests:
+- code: |
+    % localimports defaults to true
+    \begin{python}
+    import sys
+    import os
+    #assert sys.path[0] == os.path.join(os.getcwd(), 'test-cases') TODO
+    assert sys.path[0] == os.getcwd()
+    \end{python}
+- args: localimports
+  code: |
+    \begin{python}
+    import sys
+    import os
+    assert sys.path[0] == os.getcwd()
+    \end{python}
+- args: localimports=false
+  code: |
+    \begin{python}
+    import sys
+    import os
+    assert sys.path[0] != os.getcwd()
+    \end{python}

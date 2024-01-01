@@ -1,6 +1,6 @@
 name: Tests
 env:
-  cache-version: v6
+  cache-version: v4
 on: [push]
 jobs:
   tests:
@@ -18,60 +18,61 @@ jobs:
           ]
     timeout-minutes: 25
     steps:
-      - name: OS switches and PATH
-        run: |
-          if [ "$RUNNER_OS" == "Linux" ]; then
-            echo "tl-dir=~" >> $GITHUB_ENV
-            echo ~/texlive/bin/x86_64-linux >> $GITHUB_PATH
-          elif [ "$RUNNER_OS" == "Windows" ]; then
-            echo "tl-dir=D:" >> $GITHUB_ENV
-            echo D:/texlive/bin/windows >> $GITHUB_PATH
-          else
-            echo "tl-dir=~" >> $GITHUB_ENV
-            echo ~/texlive/bin/universal-darwin >> $GITHUB_PATH
-          fi
-        shell: bash
-      - uses: actions/checkout@v3
-      - uses: actions/setup-python@v4
-        with:
-          python-version: "3.9"
-          cache: pip
-      - name: Install Python dependencies
-        run: pip install -r test/requirements.txt
-      - uses: actions/cache@v3
-        id: tl-env
-        with:
-          path: |
-            ${{ env.tl-dir }}/texlive
-            ${{ env.tl-dir }}/texmf
-          key: ${{ env.cache-version }}-${{ matrix.os }}-env
-      - name: Install TeX Live
-        if: steps.tl-env.outputs.cache-hit != 'true'
-        uses: ./.github/actions/texlive-install
-        with:
-          dir: ${{ env.tl-dir }}
-      - name: Install LaTeX dependencies
-        if: steps.tl-env.outputs.cache-hit != 'true'
-        run: |
-          tlmgr option -- autobackup 0
-          tlmgr update --self
-          tlmgr install pgfplots lualatex-math luacode listings
-          tlmgr install fvextra catchfile xstring framed minted
-          tlmgr remove pyluatex || true
-      - name: Copy repository to LaTeX package folder
-        run: |
-          rm -rf ${{ env.tl-dir }}/texmf/tex/latex/pyluatex
-          mkdir -p ${{ env.tl-dir }}/texmf/tex/latex/pyluatex
-          cp -r . ${{ env.tl-dir }}/texmf/tex/latex/pyluatex/
-        shell: bash
-      - name: Run tests
-        run: |
-          cd test
-          python3 run_tests.py
-      - name: Run examples
-        run: |
-          cd example
-          for f in *.tex; do
-            lualatex -shell-escape --interaction=nonstopmode $f
-          done
-        shell: bash
+    - name: OS switches and PATH
+      run: |
+        if [ "$RUNNER_OS" == "Linux" ]; then
+          echo "tl-dir=~" >> $GITHUB_ENV
+          echo ~/texlive/bin/x86_64-linux >> $GITHUB_PATH
+        elif [ "$RUNNER_OS" == "Windows" ]; then
+          echo "tl-dir=D:" >> $GITHUB_ENV
+          echo D:/texlive/bin/windows >> $GITHUB_PATH
+        else
+          echo "tl-dir=~" >> $GITHUB_ENV
+          echo ~/texlive/bin/universal-darwin >> $GITHUB_PATH
+        fi
+      shell: bash
+    - uses: actions/checkout@v3
+    - uses: actions/setup-python@v5
+      with:
+        python-version: "3.12"
+        cache: pip
+    - name: Install Python dependencies
+      run: pip install -r test/requirements.txt
+    - uses: actions/cache@v3
+      id: tl-env
+      with:
+        path: |
+          ${{ env.tl-dir }}/texlive
+          ${{ env.tl-dir }}/texmf
+        key: ${{ env.cache-version }}-${{ matrix.os }}-env
+    - name: Install TeX Live
+      if: steps.tl-env.outputs.cache-hit != 'true'
+      uses: ./.github/actions/texlive-install
+      with:
+        dir: ${{ env.tl-dir }}
+    - name: Install LaTeX dependencies
+      if: steps.tl-env.outputs.cache-hit != 'true'
+      run: |
+        tlmgr option -- autobackup 0
+        tlmgr update --self
+        tlmgr install pgfplots lualatex-math luacode listings
+        tlmgr install fvextra catchfile xstring framed minted
+        tlmgr remove pyluatex || true
+    - name: Copy repository to LaTeX package folder
+      run: |
+        rm -rf ${{ env.tl-dir }}/texmf/tex/latex/pyluatex
+        mkdir -p ${{ env.tl-dir }}/texmf/tex/latex/pyluatex
+        cp -r . ${{ env.tl-dir }}/texmf/tex/latex/pyluatex/
+      shell: bash
+    - name: Run tests
+      run: |
+        cd test
+        python3 run_special_tests.py
+        python3 run_tests.py
+    - name: Run examples
+      run: |
+        cd example
+        for f in *.tex; do
+          lualatex --shell-escape --interaction=nonstopmode $f
+        done
+      shell: bash

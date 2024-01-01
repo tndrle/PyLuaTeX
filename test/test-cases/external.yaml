@@ -1,0 +1,18 @@
+tests:
+- code: |
+    \pyfile{test-cases/external.py}
+    \py{external_var}
+  pdf: 11
+- code: |
+    \pyfileq{\py{'test-cases/external.py'}}
+    \py{external_var}
+  pdf: 11
+- code: |
+    \pyc{b = 7}
+    \pyfile{test-cases/external_2.py}
+  pdf: 7
+- code: |
+    a
+    \pyc{b = 8}
+    \pyfileq{test-cases/external_2.py}
+  pdf: a

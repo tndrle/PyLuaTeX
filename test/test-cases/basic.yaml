@@ -1,0 +1,30 @@
+tests:
+- code: \py{1 + 3}
+  pdf: 4
+  log_not: PyLuaTeX input
+- code: |
+    \pyc{x = 1}
+    \py{x}
+  pdf: 1
+- code: |
+    % multiline possible (only special cases, though)
+    \pyc{a = 
+    2}
+    \py{a}
+  pdf: 2
+- code: |
+    % empty code
+    \py{}
+    \py{ }
+    \pyc{}
+    \pyc{ }
+- args: verbose
+  code: \py{7 - 3}
+  pdf: 4
+  log: |
+    PyLuaTeX input for session "default": print(str(7 - 3), end='')
+    PyLuaTeX output: 4
+- args: verbose=false
+  code: \py{5}
+  pdf: 5
+  log_not: PyLuaTeX input

@@ -1,0 +1,9 @@
+tests:
+- code: |
+    \pyc{a = 'default'}
+    \pysession{second}
+    \pyc{a = 'second'}
+    \py{a}
+    \pysession{default}
+    \py{a}
+  pdf: second default

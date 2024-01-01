@@ -1,0 +1,56 @@
+success: false
+tests:
+- code: \py{a}
+  log: |
+    PyLuaTeX input for session "default": print(str(a), end='')
+    PyLuaTeX output: Traceback (most recent call last):
+      File "<input>", line 1, in <module>
+    NameError: name 'a' is not defined
+
+    ! Package PyLuaTeX Error: Python error (see above).
+- code: |
+    \begin{pythonrepl} a = 1
+    print(a)
+    \end{pythonrepl}
+  log: |
+    NameError: name 'a' is not defined
+
+    ! Package PyLuaTeX Error: Python error (see above).
+- code: |
+    \begin{pythonq} a = 1
+    print(a)
+    \end{pythonq}
+  log: |
+    NameError: name 'a' is not defined
+
+    ! Package PyLuaTeX Error: Python error (see above).
+- code: |
+    \begin{python}
+     a = 1
+    print(a)
+    \end{python}
+  log: |
+    IndentationError: unexpected indent
+
+    ! Package PyLuaTeX Error: Python error (see above).
+- code: |
+    \pyc{a = 1}
+    \pysession{a}
+    \py{print(a)}
+  log: |
+    NameError: name 'a' is not defined
+
+    ! Package PyLuaTeX Error: Python error (see above).
+- code: |
+    % interpreted as 'a = 2 b = 2' because \pyc is not verbatim
+    \pyc{a = 2
+    b = 2}
+  log: |2
+      File "<input>", line 1
+        a = 2 b = 2
+              ^
+    SyntaxError: invalid syntax
+
+    ! Package PyLuaTeX Error: Python error (see above).
+- code: \begin{python} \end{python}
+  log: '*** (job aborted, no legal \end found)'

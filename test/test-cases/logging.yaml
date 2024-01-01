@@ -1,0 +1,22 @@
+tests:
+- code: |
+    \begin{python}
+    tex.log('test', 1, {}, [])
+    \end{python}
+  log: test 1 {} []
+- code: |
+    \begin{pythonq}
+      tex.log('test', 2, {}, [])
+    \end{pythonq}
+  log: test 2 {} []
+- code: \py{tex.log('test', 3, {}, [])}
+  log: test 3 {} []
+- code: |
+    \pyc{tex.log()}
+    \pyc{tex.log('test', 4, {}, [], sep='-', end='<')}
+  log: test-4-{}-[]<
+- success: false
+  code: |
+    % logged text appears in TeX log even though there is a Python error
+    \pyc{tex.log('PyLuaTeX', 'log test'); print(a)}
+  log: PyLuaTeX log test

@@ -1,0 +1,31 @@
+tests:
+- code: |
+    \begin{pythonq}
+    a = 7
+    \end{pythonq}
+    \pyif{a == 7}{1}{0}
+  pdf: 1
+- code: \pyif{True}{x \par y}{0}
+  pdf: |
+    x
+    y
+- code:
+    \pyif{False}{1}{
+    \begin{center}
+    c
+    \end{center}
+    }
+  pdf: c
+- code: |
+    % \pyif does not affect code and output buffer
+    \begin{pythonq}
+    a = 5
+    print('x')
+    \end{pythonq}
+    \pyif{a == 1}{1}{0}
+    \directlua{
+      texio.write("TEST OUTPUT ")
+      texio.write(pyluatex.get_last_code()[1] .. " ")
+      texio.write(pyluatex.get_last_output()[1])
+    }
+  log: TEST OUTPUT a = 5 x
