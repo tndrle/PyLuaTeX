@@ -16,10 +16,10 @@ runs:
       sed "s|%%INST%%|${INST_DIR}|" $GITHUB_ACTION_PATH/tl.profile_tmpl > tl.profile
     shell: bash
   - if: ${{ runner.os == 'Windows' }}
-    run: install-tl\install-tl-windows.bat --profile tl.profile
+    run: install-tl\install-tl-windows.bat --profile tl.profile --repository https://ctan.math.illinois.edu/systems/texlive/tlnet
     shell: cmd
   - if: ${{ runner.os != 'Windows' }}
-    run: install-tl/install-tl --profile tl.profile
+    run: install-tl/install-tl --profile tl.profile --repository https://ctan.math.illinois.edu/systems/texlive/tlnet
     shell: bash
   - run: rm -rf install-tl tl.profile
     shell: bash
