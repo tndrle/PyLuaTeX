@@ -8,6 +8,10 @@
 \setbeamertemplate{navigation symbols}{}
 \usepackage{luacode}
 
+\def\TESTID{%s}
+\typeout{TestID: \TESTID}
+\directlua{pdf.setinfo("/TestID (\TESTID)")}
+
 \begin{document}
 %s
 \end{document}

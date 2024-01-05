@@ -1,23 +1,23 @@
 tests:
 - code: |
     % localimports defaults to true
-    \begin{python}
-    import sys
-    import os
-    #assert sys.path[0] == os.path.join(os.getcwd(), 'test-cases') TODO
-    assert sys.path[0] == os.getcwd()
-    \end{python}
+    \pyc{import sys, os; assert sys.path[0] == os.getcwd()}
 - args: localimports
   code: |
-    \begin{python}
-    import sys
-    import os
-    assert sys.path[0] == os.getcwd()
-    \end{python}
+    \pyc{import sys, os; assert sys.path[0] == os.getcwd()}
+- args: localimports
+  absolute_path: true
+  code: |
+    \pyc{import sys, os; assert sys.path[0] == os.getcwd()}
+- args: localimports
+  folder: foo
+  code: |
+    \pyc{import sys, os; assert sys.path[0] == os.path.join(os.getcwd(), 'foo')}
+- args: localimports
+  absolute_path: true
+  folder: foo
+  code: |
+    \pyc{import sys, os; assert sys.path[0] == os.path.join(os.getcwd(), 'foo')}
 - args: localimports=false
   code: |
-    \begin{python}
-    import sys
-    import os
-    assert sys.path[0] != os.getcwd()
-    \end{python}
+    \pyc{import sys, os; assert sys.path[0] != os.getcwd()}
