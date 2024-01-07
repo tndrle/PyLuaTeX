@@ -101,7 +101,7 @@ For an example, see the [Typesetting Code](#typesetting-code) section.
   Specifies when the Python process is shut down. (default: `veryveryend`)<br>
   *Options:* `veryveryend`, `veryenddocument`, `off`<br>
   PyLuaTeX shuts down the Python interpreter when the compilation is done. With the option `veryveryend`, Python is shut down in the `enddocument/end` hook. With the option `veryenddocument`, Python is shut down in the `enddocument/afteraux` hook. With the option `off`, Python is not shut down explicitly. However, the Python process will shut down when the LuaTeX process finishes even if `off` is selected. Using `off` on Windows might lead to problems with SyncTeX, though.<br>
-  Before v0.7.0, PyLuaTeX used the hooks `\AtVeryVeryEnd` and `\AtVeryEndDocument` of the package *atveryend*. The new hooks `enddocument/end` and `enddocument/afteraux` are equivalent to those of the *atveryend* package.<br>
+  Before v0.6.2, PyLuaTeX used the hooks `\AtVeryVeryEnd` and `\AtVeryEndDocument` of the package *atveryend*. The new hooks `enddocument/end` and `enddocument/afteraux` are equivalent to those of the *atveryend* package.<br>
   *Example:* `\usepackage[shutdown=veryenddocument]{pyluatex}`
 * `verbose`<br>
   If this option is set, Python input and output is written to the LaTeX log file.<br>
