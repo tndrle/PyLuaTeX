@@ -38,22 +38,13 @@
 \directlua{pyluatex.start([==[\pyluatex@executable]==], \pyluatex@boolopt{localimports})}
 
 \ExplSyntaxOn
-\cs_generate_variant:Nn \tl_if_eq:nnTF { V }
-\tl_if_eq:VnTF{\pyluatex@shutdown}{veryveryend}{
-    \RequirePackage{atveryend}
-    \AtVeryVeryEnd{\directlua{pyluatex.shutdown()}}
-}{
-    \tl_if_eq:VnTF{\pyluatex@shutdown}{veryenddocument}{
-        \RequirePackage{atveryend}
-        \AtVeryEndDocument{\directlua{pyluatex.shutdown()}}
-    }{
-        \tl_if_eq:VnTF{\pyluatex@shutdown}{off}{}{
-            \PackageError{PyLuaTeX}{
-                Invalid~value~for~package~option~"shutdown":~\pyluatex@shutdown
-            }{}
-        }
-    }
-}
+\str_case_e:nnF{\pyluatex@shutdown}{
+    {veryveryend}{
+        \AddToHook{enddocument/end}{\directlua{pyluatex.shutdown()}}
+    }{veryenddocument}{
+        \AddToHook{enddocument/afteraux}{\directlua{pyluatex.shutdown()}}
+    }{off}{}
+}{\PackageError{PyLuaTeX}{Invalid~value~for~package~option~"shutdown":~\pyluatex@shutdown}{}}
 \ExplSyntaxOff
 
 \newcommand*{\PyLTVerbatimEnv}{\directlua{pyluatex.set_parent_env([==[\@currenvir]==])}}
