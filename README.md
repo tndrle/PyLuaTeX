@@ -9,7 +9,7 @@ LaTeX documents must be compiled with LuaLaTeX for this to work.
 [![Tests workflow](https://github.com/tndrle/PyLuaTeX/actions/workflows/tests.yml/badge.svg)](https://github.com/tndrle/PyLuaTeX/actions)
 
 ## Example
-1. LaTeX document `example.tex`  
+1. LaTeX document `example.tex`<br>
 ```latex
 \documentclass{article}
 
@@ -50,31 +50,31 @@ executed. For this reason, it is recommended to compile trusted documents only.
 
 ### Further Examples
 The folder `example` contains additional example documents:
-* `beamer.tex`  
+* `beamer.tex`<br>
   Demonstrates the use of PyLuaTeX environments and typesetting in *BEAMER* presentations. In particular, the `fragile` option for frames is highlighted.
-* `data-visualization.tex`  
+* `data-visualization.tex`<br>
   Demonstrates the visualization of data using *pgfplots* and *pandas*
-* `matplotlib-external.tex`  
+* `matplotlib-external.tex`<br>
   Demonstrates how *matplotlib* plots can be generated and included in a document
-* `matplotlib-pgf.tex`  
+* `matplotlib-pgf.tex`<br>
   Demonstrates how *matplotlib* plots can be generated and included in a document using *PGF*
-* `readme-example.tex`  
+* `readme-example.tex`<br>
   The example above
-* `repl.tex`  
+* `repl.tex`<br>
   Demonstrates how a Python console/REPL can be run and typeset
-* `sessions.tex`  
+* `sessions.tex`<br>
   Demonstrates the use of different Python sessions in a document
-* `typesetting-example.tex`  
+* `typesetting-example.tex`<br>
   The code typesetting example below
-* `typesetting-listings.tex`  
+* `typesetting-listings.tex`<br>
   A detailed example for typesetting code and output with the *listings* package
-* `typesetting-minted.tex`  
+* `typesetting-minted.tex`<br>
   A detailed example for typesetting code and output with the *minted* package
 
 ## Installation
 PyLuaTeX is available in TeX Live, MiKTeX, and on [CTAN](https://ctan.org/pkg/pyluatex) as `pyluatex`.
 
-To install PyLuaTeX in **TeX Live** run `tlmgr install pyluatex`.  
+To install PyLuaTeX in **TeX Live** run `tlmgr install pyluatex`.<br>
 In **MiKTeX**, PyLuaTeX can be installed in the *MiKTeX Console*.
 
 ## Reference
@@ -87,65 +87,66 @@ This is helpful if you want to process code or output further and do your own ty
 For an example, see the [Typesetting Code](#typesetting-code) section.
 
 ### Package Options
-* `executable`  
-  Specifies the path to the Python executable. (default: `python3`)  
+* `executable`<br>
+  Specifies the path to the Python executable. (default: `python3`)<br>
   *Example:* `\usepackage[executable=/usr/local/bin/python3]{pyluatex}`
-* `ignoreerrors`  
+* `ignoreerrors`<br>
   By default, PyLuaTeX aborts the compilation process when Python reports an error.
-  If the `ignoreerrors` option is set, the compilation process is not aborted.  
+  If the `ignoreerrors` option is set, the compilation process is not aborted.<br>
   *Example:* `\usepackage[ignoreerrors]{pyluatex}`
-* `localimports`  
-  If this option is set, the folder containing the TeX input file is added to the Python path. This allows local Python packages to be imported. (default: `true`)  
+* `localimports`<br>
+  If this option is set, the folder containing the TeX input file is added to the Python path. This allows local Python packages to be imported. (default: `true`)<br>
   *Example:* `\usepackage[localimports=false]{pyluatex}`
-* `shutdown`  
-  Specifies when the Python process is shut down. (default: `veryveryend`)  
-  *Options:* `veryveryend`, `veryenddocument`, `off`  
-  PyLuaTeX uses the hooks of the package *atveryend* to shut down the Python interpreter when the compilation is done. With the option `veryveryend`, Python is shut down in the `\AtVeryVeryEnd` hook. With the option `veryenddocument`, Python is shut down in the `\AtVeryEndDocument` hook. With the option `off`, Python is not shut down explicitly. However, the Python process will shut down when the LuaTeX process finishes even if `off` is selected. Using `off` on Windows might lead to problems with SyncTeX, though.  
+* `shutdown`<br>
+  Specifies when the Python process is shut down. (default: `veryveryend`)<br>
+  *Options:* `veryveryend`, `veryenddocument`, `off`<br>
+  PyLuaTeX shuts down the Python interpreter when the compilation is done. With the option `veryveryend`, Python is shut down in the `enddocument/end` hook. With the option `veryenddocument`, Python is shut down in the `enddocument/afteraux` hook. With the option `off`, Python is not shut down explicitly. However, the Python process will shut down when the LuaTeX process finishes even if `off` is selected. Using `off` on Windows might lead to problems with SyncTeX, though.<br>
+  Before v0.7.0, PyLuaTeX used the hooks `\AtVeryVeryEnd` and `\AtVeryEndDocument` of the package *atveryend*. The new hooks `enddocument/end` and `enddocument/afteraux` are equivalent to those of the *atveryend* package.<br>
   *Example:* `\usepackage[shutdown=veryenddocument]{pyluatex}`
-* `verbose`  
-  If this option is set, Python input and output is written to the LaTeX log file.  
+* `verbose`<br>
+  If this option is set, Python input and output is written to the LaTeX log file.<br>
   *Example:* `\usepackage[verbose]{pyluatex}`
 
 The package options `verbose` and `ignoreerrors` can be changed in the document with the
 `\pyoption` command, e.g. `\pyoption{verbose}{true}` or `\pyoption{ignoreerrors}{false}`.
 
 ### Macros
-* `\py{<code>}`  
-  Executes (object-like) `<code>` and writes its string representation to the document.  
+* `\py{<code>}`<br>
+  Executes (object-like) `<code>` and writes its string representation to the document.<br>
   *Example:* `\py{3 + 7}`
-* `\pyq{<code>}`  
-  Executes (object-like) `<code>`. Any output is suppressed.  
+* `\pyq{<code>}`<br>
+  Executes (object-like) `<code>`. Any output is suppressed.<br>
   *Example:* `\pyq{3 + 7}`
-* `\pyc{<code>}`  
-  Executes `<code>`. Output (e.g. from a call to `print()`) is written to the document.  
+* `\pyc{<code>}`<br>
+  Executes `<code>`. Output (e.g. from a call to `print()`) is written to the document.<br>
   *Examples:* `\pyc{x = 5}`, `\pyc{print('hello')}`
-* `\pycq{<code>}`  
-  Executes `<code>`. Any output is suppressed.  
+* `\pycq{<code>}`<br>
+  Executes `<code>`. Any output is suppressed.<br>
   *Example:* `\pycq{x = 5}`
-* `\pyfile{<path>}`  
-  Executes the Python file specified by `<path>`. Output (e.g. from a call to `print()`) is written to the document.  
+* `\pyfile{<path>}`<br>
+  Executes the Python file specified by `<path>`. Output (e.g. from a call to `print()`) is written to the document.<br>
   *Example:* `\pyfile{main.py}`
-* `\pyfileq{<path>}`  
-  Executes the Python file specified by `<path>`. Any output is suppressed.  
+* `\pyfileq{<path>}`<br>
+  Executes the Python file specified by `<path>`. Any output is suppressed.<br>
   *Example:* `\pyfileq{main.py}`
-* `\pysession{<session>}`  
-  Selects `<session>` as Python session for subsequent Python code.  
-  The session that is active at the beginning is `default`.  
+* `\pysession{<session>}`<br>
+  Selects `<session>` as Python session for subsequent Python code.<br>
+  The session that is active at the beginning is `default`.<br>
   *Example:* `\pysession{main}`
-* `\pyoption{<option>}{<value>}`  
+* `\pyoption{<option>}{<value>}`<br>
   Assigns `<value>` to the package option `<option>` anywhere in the document. For more information consider
-  the [Package Options](#package-options) section.  
+  the [Package Options](#package-options) section.<br>
   *Example:* `\pyoption{verbose}{true}`
-* `\pyif{<test>}{<then clause>}{<else clause>}`  
-  Evaluates the Python boolean expression `<test>`, and then executes either the LaTeX code in `<then clause>` or the LaTeX code in `<else clause>`.  
+* `\pyif{<test>}{<then clause>}{<else clause>}`<br>
+  Evaluates the Python boolean expression `<test>`, and then executes either the LaTeX code in `<then clause>` or the LaTeX code in `<else clause>`.<br>
   *Example:* `\pyif{a == 1}{$a = 1$}{$a \neq 1$}`
 
 ### Environments
-* `python`  
-  Executes the provided block of Python code.  
-  The environment handles characters like `_`, `#`, `%`, `\`, etc.  
-  Code on the same line as `\begin{python}` is ignored, i.e., code must start on the next line.  
-  If leading spaces are present they are gobbled automatically up to the first level of indentation.  
+* `python`<br>
+  Executes the provided block of Python code.<br>
+  The environment handles characters like `_`, `#`, `%`, `\`, etc.<br>
+  Code on the same line as `\begin{python}` is ignored, i.e., code must start on the next line.<br>
+  If leading spaces are present they are gobbled automatically up to the first level of indentation.<br>
   *Example:*
   ```
   \begin{python}
@@ -153,9 +154,9 @@ The package options `verbose` and `ignoreerrors` can be changed in the document 
       print(x)
   \end{python}
   ```
-* `pythonq`  
+* `pythonq`<br>
   Same as the `python` environment, but any output is suppressed.
-* `pythonrepl`  
+* `pythonrepl`<br>
   Executes the provided block of Python code in an interactive console/REPL. Code and output are
   stored together in the output buffer and can be typeset as explained in section
   [Typesetting Code](#typesetting-code) or as shown in the example `repl.tex` in the folder
