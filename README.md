@@ -255,4 +255,4 @@ No placeholders have to be inserted.
 
 ## License
 [LPPL 1.3c](http://www.latex-project.org/lppl.txt) for LaTeX code and
-[MIT license](https://opensource.org/licenses/MIT) for Python and Lua code.
+[MIT license](https://opensource.org/licenses/MIT) for Python and Lua code and other files.
