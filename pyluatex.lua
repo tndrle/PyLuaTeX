@@ -74,10 +74,10 @@ function pyluatex.start(executable, local_imports)
     if local_imports then
         local tex_file_folder = get_tex_file_folder()
         if tex_file_folder ~= nil then
-            cmd = " \"" .. tex_file_folder .. "\""
+            cmd = ' "' .. tex_file_folder .. '"'
         end
     end
-    cmd = executable .. " \"" .. script .. "\"" .. cmd
+    cmd = executable .. ' "' .. script .. '"' .. cmd
     if os.type == "windows" then
         cmd = "start /B " .. cmd
     else
@@ -138,8 +138,8 @@ function pyluatex.execute(code, auto_print, write, repl_mode, store)
     end
 
     if pyluatex.verbose or not resp.success then
-        texio.write_nl("PyLuaTeX input for session \"" .. pyluatex.session ..
-            "\": " .. full_code)
+        texio.write_nl('PyLuaTeX input for session "' .. pyluatex.session ..
+            '": ' .. full_code)
         texio.write_nl("PyLuaTeX output: " .. resp.output)
     end
 
@@ -221,7 +221,7 @@ local function parse_bool(name, value)
     elseif value == "false" then
         return false
     else
-        show_err("Invalid value \"" .. value .. "\" for option \"" .. name .. "\"")
+        show_err('Invalid value "' .. value .. '" for option "' .. name .. '"')
     end
 end
 
@@ -232,7 +232,7 @@ function pyluatex.set_option(name, value)
     elseif name == "verbose" then
         pyluatex.verbose = parse_bool(name, value)
     else
-        show_err("Unknown option \"" .. name .. "\"")
+        show_err('Unknown option "' .. name .. '"')
     end
 end
 
