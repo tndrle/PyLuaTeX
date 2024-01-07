@@ -13,11 +13,11 @@
 
 \RequirePackage{expl3}
 \ExplSyntaxOn
-\sys_if_engine_luatex:TF{}{
+\sys_if_engine_luatex:F{
     \PackageError{PyLuaTeX}{LuaTeX~is~required}{}
 }
-\sys_if_shell_unrestricted:TF{}{
-    \PackageError{PyLuaTeX}{Shell~escape~required~(add~-shell-escape~option)}{}
+\sys_if_shell_unrestricted:F{
+    \PackageError{PyLuaTeX}{Shell~escape~is~required~(add~--shell-escape~option)}{}
 }
 \ExplSyntaxOff
 
@@ -31,12 +31,11 @@
 \DeclareStringOption[veryveryend]{shutdown}
 \ProcessKeyvalOptions*
 
-\directlua{pyluatex.ignore_errors = \ifpyluatex@ignoreerrors true\else false\fi}
-\directlua{pyluatex.verbose = \ifpyluatex@verbose true\else false\fi}
-\directlua{pyluatex.start(
-    [==[\pyluatex@executable]==],
-    \ifpyluatex@localimports true\else false\fi
-)}
+\newcommand*{\pyluatex@boolopt}[1]{\csname ifpyluatex@#1\endcsname true\else false\fi}
+
+\directlua{pyluatex.ignore_errors = \pyluatex@boolopt{ignoreerrors}}
+\directlua{pyluatex.verbose = \pyluatex@boolopt{verbose}}
+\directlua{pyluatex.start([==[\pyluatex@executable]==], \pyluatex@boolopt{localimports})}
 
 \ExplSyntaxOn
 \cs_generate_variant:Nn \tl_if_eq:nnTF { V }

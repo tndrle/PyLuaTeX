@@ -47,8 +47,8 @@ local last_code = nil
 local last_output = nil
 
 local function get_tex_file_folder()
-    for k, v in ipairs(arg) do
-        if not v:find("^%-") then
+    for _, v in ipairs(arg) do
+        if v:sub(1, 1) ~= "-" then
             local path = file.collapsepath(v, true)
             if lfs.isfile(path) then
                 return file.pathpart(path)
@@ -236,9 +236,9 @@ function pyluatex.run_file(path, write, repl_mode)
         f:close()
         -- ignore trailing new line if present
         if code:sub(-2) == "\r\n" then
-            code = code:sub(0, -3)
+            code = code:sub(1, -3)
         elseif code:sub(-1) == "\n" then
-            code = code:sub(0, -2)
+            code = code:sub(1, -2)
         end
         pyluatex.execute(code, false, write, repl_mode, true)
     else
