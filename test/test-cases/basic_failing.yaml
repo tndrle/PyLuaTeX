@@ -8,6 +8,14 @@ tests:
     NameError: name 'a' is not defined
 
     ! Package PyLuaTeX Error: Python error (see above).
+- code: \pyq{a}
+  log: |
+    PyLuaTeX input for session "default": print(str(a), end='')
+    PyLuaTeX output: Traceback (most recent call last):
+      File "<input>", line 1, in <module>
+    NameError: name 'a' is not defined
+
+    ! Package PyLuaTeX Error: Python error (see above).
 - code: |
     \begin{pythonrepl} a = 1
     print(a)

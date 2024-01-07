@@ -38,8 +38,6 @@ local tcp = nil
 local env_end = nil
 local env_lines = nil
 local parent_env = nil
-local env_repl_mode = false
-local env_success = true
 
 local last_code = nil
 local last_output = nil
@@ -59,10 +57,6 @@ local function get_tex_file_folder()
         end
     end
     return nil
-end
-
-local function err_cmd(message)
-    return "\\PackageError{PyLuaTeX}{" .. message .. "}{}"
 end
 
 local function show_err(message)
@@ -122,14 +116,6 @@ local function request(data)
     return utilities.json.tolua(output)
 end
 
-local function log_input(code)
-    texio.write_nl("PyLuaTeX input for session \"" .. pyluatex.session .. "\": " .. code)
-end
-
-local function log_output(code)
-    texio.write_nl("PyLuaTeX output: " .. code)
-end
-
 function pyluatex.execute(code, auto_print, write, repl_mode, store)
     local full_code
     if auto_print then
@@ -138,16 +124,12 @@ function pyluatex.execute(code, auto_print, write, repl_mode, store)
         full_code = code
     end
 
-    if pyluatex.verbose then log_input(full_code) end
-
-    local resp = request(
-        {
-            session = pyluatex.session,
-            code = full_code,
-            repl_mode = repl_mode,
-            ignore_errors = pyluatex.ignore_errors
-        }
-    )
+    local resp = request({
+        session = pyluatex.session,
+        code = full_code,
+        repl_mode = repl_mode,
+        ignore_errors = pyluatex.ignore_errors
+    })
     local code_lines = code:splitlines()
     local output_lines = resp.output:splitlines()
     if store then
@@ -155,61 +137,49 @@ function pyluatex.execute(code, auto_print, write, repl_mode, store)
         last_output = output_lines
     end
 
-    if resp.success or pyluatex.ignore_errors then
-        if pyluatex.verbose or not resp.success then log_output(resp.output) end
+    if pyluatex.verbose or not resp.success then
+        texio.write_nl("PyLuaTeX input for session \"" .. pyluatex.session ..
+            "\": " .. full_code)
+        texio.write_nl("PyLuaTeX output: " .. resp.output)
+    end
 
-        if write then
-            tex.print(output_lines)
-        end
+    if resp.success or pyluatex.ignore_errors then
+        if write then tex.print(output_lines) end
     else
-        if not pyluatex.verbose then log_input(full_code) end
-        log_output(resp.output)
-        if write then
-            show_err("Python error (see above)")
-        end
+        show_err("Python error (see above)")
     end
 
     if not_empty(resp.log_msg) then texio.write(resp.log_msg) end
-
-    return resp.success
 end
 
-function pyluatex.print_env()
-    if last_output ~= nil and (env_success or pyluatex.ignore_errors) then
-        tex.print(last_output)
-    end
+function pyluatex.execute_env(write, repl_mode)
+    local code = table.concat(env_lines, "\n")
+    pyluatex.execute(code, false, write, repl_mode, true)
 end
 
 local function record_line(line)
-    local s, e = line:find(env_end, 1, true)
+    local s = line:find(env_end)
     if s ~= nil then
         luatexbase.remove_from_callback("process_input_buffer", "pyluatex_record_line")
-        local code_in_line = line:sub(1, s - 1)
-        if code_in_line:strip():len() > 0 then
+        local code = line:sub(1, s - 1)
+        if code:strip():len() > 0 then
             -- only include this line if it contains non-whitespace characters
-            table.insert(env_lines, code_in_line)
+            table.insert(env_lines, code)
         end
-        local code = table.concat(env_lines, "\n")
-        env_success = pyluatex.execute(code, false, false, env_repl_mode, true)
-        if env_success or pyluatex.ignore_errors then
-            return line:sub(s)
-        else
-            return env_end .. err_cmd("Python error (see above)") .. line:sub(e + 1)
-        end
+        return line:sub(s)
     else
         table.insert(env_lines, line)
         return ""
     end
 end
 
-function pyluatex.record_env(name, repl_mode)
+function pyluatex.record_env(name)
     if parent_env ~= nil then
         name = parent_env
         parent_env = nil
     end
-    env_end = "\\end{" .. name .. "}"
+    env_end = "\\end%s*{" .. name:escapedpattern() .. "}"
     env_lines = {}
-    env_repl_mode = repl_mode
     luatexbase.add_to_callback("process_input_buffer", record_line, "pyluatex_record_line")
 end
 

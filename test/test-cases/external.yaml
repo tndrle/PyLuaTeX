@@ -7,6 +7,12 @@ tests:
     \pyfileq{\py{'test-cases/external.py'}}
     \py{external_var}
   pdf: 11
+- success: false
+  code: \pyfileq{test-cases/external_2.py}
+  log: |
+    NameError: name 'b' is not defined
+
+    ! Package PyLuaTeX Error: Python error (see above).
 - code: |
     \pyc{b = 7}
     \pyfile{test-cases/external_2.py}

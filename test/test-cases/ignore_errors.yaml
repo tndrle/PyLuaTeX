@@ -6,6 +6,7 @@ tests:
 
     ZeroDivisionError: division by zero
   log: |
+    PyLuaTeX input for session "default": 1 / 0
     PyLuaTeX output: Traceback (most recent call last):
       File "<input>", line 1, in <module>
     ZeroDivisionError: division by zero

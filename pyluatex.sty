@@ -58,12 +58,14 @@
 
 \newcommand*{\PyLTVerbatimEnv}{\directlua{pyluatex.set_parent_env([==[\@currenvir]==])}}
 
-\newenvironment{python}{\directlua{pyluatex.record_env("python", false)}}
-{\directlua{pyluatex.print_env()}}
+\newenvironment{python}{\directlua{pyluatex.record_env("python")}}
+{\directlua{pyluatex.execute_env(true, false)}}
 
-\newenvironment{pythonq}{\directlua{pyluatex.record_env("pythonq", false)}}{}
+\newenvironment{pythonq}{\directlua{pyluatex.record_env("pythonq")}}
+{\directlua{pyluatex.execute_env(false, false)}}
 
-\newenvironment{pythonrepl}{\directlua{pyluatex.record_env("pythonrepl", true)}}{}
+\newenvironment{pythonrepl}{\directlua{pyluatex.record_env("pythonrepl")}}
+{\directlua{pyluatex.execute_env(false, true)}}
 
 \newcommand*{\pyluatex@inline}[3]{\directlua{pyluatex.execute([==[#1]==], #2, #3, false, true)}}
 
