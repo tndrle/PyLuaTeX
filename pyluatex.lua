@@ -65,6 +65,10 @@ local function err_cmd(message)
     return "\\PackageError{PyLuaTeX}{" .. message .. "}{}"
 end
 
+local function show_err(message)
+    tex.sprint("\\PackageError{PyLuaTeX}{" .. message .. "}{}")
+end
+
 local function not_empty(str)
     return str ~= nil and str ~= ""
 end
@@ -90,7 +94,7 @@ function pyluatex.start(executable, local_imports)
     f:close()
 
     local function err(message)
-        tex.sprint(err_cmd("Python backend could not be started (" .. message .. ")"))
+        show_err("Python backend could not be started (" .. message .. ")")
     end
 
     if port == nil then
@@ -161,7 +165,7 @@ function pyluatex.execute(code, auto_print, write, repl_mode, store)
         if not pyluatex.verbose then log_input(full_code) end
         log_output(resp.output)
         if write then
-            tex.sprint(err_cmd("Python error (see above)"))
+            show_err("Python error (see above)")
         end
     end
 
@@ -228,7 +232,7 @@ function pyluatex.run_file(path, write, repl_mode)
         end
         pyluatex.execute(code, false, write, repl_mode, true)
     else
-        tex.sprint(err_cmd("File not found: " .. path))
+        show_err("File not found: " .. path)
     end
 end
 
@@ -247,9 +251,7 @@ local function parse_bool(name, value)
     elseif value == "false" then
         return false
     else
-        tex.sprint(
-            err_cmd("Invalid value '" .. value .. "' for option " .. name)
-        )
+        show_err("Invalid value \"" .. value .. "\" for option \"" .. name .. "\"")
     end
 end
 
@@ -260,7 +262,7 @@ function pyluatex.set_option(name, value)
     elseif name == "verbose" then
         pyluatex.verbose = parse_bool(name, value)
     else
-        tex.sprint(err_cmd("Unknown option '" .. name .. "'"))
+        show_err("Unknown option \"" .. name .. "\"")
     end
 end
 

@@ -1,7 +1,7 @@
 tests:
 - success: false
   code: \pyoption{foo}{true}
-  log: "! Package PyLuaTeX Error: Unknown option 'foo'."
+  log: '! Package PyLuaTeX Error: Unknown option "foo".'
 - code: \pyoption{verbose}{true}
 - code: \pyoption{verbose}{false}
 - code: \pyoption{verbose}{ true}
@@ -19,4 +19,4 @@ tests:
 - code: \pyoption{ignoreerrors}{false}
 - success: false
   code: \pyoption{verbose}{foo}
-  log: "! Package PyLuaTeX Error: Invalid value 'foo' for option verbose."
+  log: '! Package PyLuaTeX Error: Invalid value "foo" for option "verbose".'
