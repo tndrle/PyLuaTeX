@@ -22,7 +22,7 @@ FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
 IN THE SOFTWARE.
 --]]
 
-require("lualibs-util-jsn")
+require("lualibs")
 local socket = require("socket")
 
 pyluatex = pyluatex or {
@@ -30,8 +30,6 @@ pyluatex = pyluatex or {
     verbose = false,
     session = "default"
 }
-
-local dir_sep = package.config:sub(1,1)
 
 -- status.filename: path to pyluatex.sty
 local folder = file.pathpart(file.collapsepath(status.filename, true))
@@ -63,17 +61,16 @@ local function get_tex_file_folder()
     return nil
 end
 
-local function trim(s)
-    return (s:gsub("^%s*(.-)%s*$", "%1"))
-end
-
 local function err_cmd(message)
     return "\\PackageError{PyLuaTeX}{" .. message .. "}{}"
 end
 
+local function not_empty(str)
+    return str ~= nil and str ~= ""
+end
+
 function pyluatex.start(executable, local_imports)
     local script = file.join(folder, "pyluatex-interpreter.py")
-    local is_windows = dir_sep ~= "/"
 
     local cmd = ""
     if local_imports then
@@ -83,7 +80,7 @@ function pyluatex.start(executable, local_imports)
         end
     end
     cmd = executable .. " \"" .. script .. "\"" .. cmd
-    if is_windows then
+    if os.type == "windows" then
         cmd = "start /B " .. cmd
     else
         cmd = cmd .. " &"
@@ -92,7 +89,7 @@ function pyluatex.start(executable, local_imports)
     local port = f:read("*l")
     f:close()
 
-    function err(message)
+    local function err(message)
         tex.sprint(err_cmd("Python backend could not be started (" .. message .. ")"))
     end
 
@@ -100,7 +97,7 @@ function pyluatex.start(executable, local_imports)
         err("executable: " .. executable)
         return
     end
-    port = trim(port)
+    port = port:fullstrip()
     if port:match("^%d+$") == nil then
         err("invalid TCP port: " .. port)
         return
@@ -129,18 +126,6 @@ local function log_output(code)
     texio.write_nl("PyLuaTeX output: " .. code)
 end
 
-local function split_lines(str)
-    if str:sub(-1) ~= "\n" then
-        str = str .. "\n"
-    end
-
-    local t = {}
-    for s in str:gmatch("(.-)\r?\n") do
-        table.insert(t, s)
-    end
-    return t
-end
-
 function pyluatex.execute(code, auto_print, write, repl_mode, store)
     local full_code
     if auto_print then
@@ -159,9 +144,10 @@ function pyluatex.execute(code, auto_print, write, repl_mode, store)
             ignore_errors = pyluatex.ignore_errors
         }
     )
-    local output_lines = split_lines(resp.output)
+    local code_lines = code:splitlines()
+    local output_lines = resp.output:splitlines()
     if store then
-        last_code = split_lines(code)
+        last_code = code_lines
         last_output = output_lines
     end
 
@@ -179,7 +165,7 @@ function pyluatex.execute(code, auto_print, write, repl_mode, store)
         end
     end
 
-    if resp.log_msg ~= "" then texio.write(resp.log_msg) end
+    if not_empty(resp.log_msg) then texio.write(resp.log_msg) end
 
     return resp.success
 end
@@ -195,7 +181,7 @@ local function record_line(line)
     if s ~= nil then
         luatexbase.remove_from_callback("process_input_buffer", "pyluatex_record_line")
         local code_in_line = line:sub(1, s - 1)
-        if trim(code_in_line):len() > 0 then
+        if code_in_line:strip():len() > 0 then
             -- only include this line if it contains non-whitespace characters
             table.insert(env_lines, code_in_line)
         end
@@ -255,6 +241,7 @@ function pyluatex.get_last_output()
 end
 
 local function parse_bool(name, value)
+    value = value:fullstrip()
     if value == "true" then
         return true
     elseif value == "false" then
@@ -267,8 +254,7 @@ local function parse_bool(name, value)
 end
 
 function pyluatex.set_option(name, value)
-    name = trim(name)
-    value = trim(value)
+    name = name:fullstrip()
     if name == "ignoreerrors" then
         pyluatex.ignore_errors = parse_bool(name, value)
     elseif name == "verbose" then
