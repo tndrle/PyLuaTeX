@@ -67,6 +67,14 @@ local function not_empty(str)
     return str ~= nil and str ~= ""
 end
 
+local function split_lines(str)
+    local lines = str:splitlines()
+    if lines[#lines] == "" then
+        table.remove(lines, #lines)
+    end
+    return lines
+end
+
 function pyluatex.start(executable, local_imports)
     local script = file.join(folder, "pyluatex-interpreter.py")
 
@@ -130,8 +138,8 @@ function pyluatex.execute(code, auto_print, write, repl_mode, store)
         repl_mode = repl_mode,
         ignore_errors = pyluatex.ignore_errors
     })
-    local code_lines = code:splitlines()
-    local output_lines = resp.output:splitlines()
+    local code_lines = split_lines(code)
+    local output_lines = split_lines(resp.output)
     if store then
         last_code = code_lines
         last_output = output_lines

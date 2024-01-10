@@ -1,0 +1,29 @@
+tests:
+- code: |
+    \begin{pythonrepl}
+    def func(x):
+      return 2 * x
+
+    func(7)
+    \end{pythonrepl}
+    \begin{luacode}
+      local output = pyluatex.get_last_output()
+      texio.write_nl("Last output line: |" .. output[#output] .. "|")
+    \end{luacode}
+  log: |
+    Last output line: |14|
+- code: |
+    \begin{python}
+    a = 11
+    print(a)
+    \end{python}
+    \begin{luacode}
+      local code = pyluatex.get_last_code()
+      texio.write_nl("Last code line: |" .. code[#code] .. "|")
+      local output = pyluatex.get_last_output()
+      texio.write_nl("Last output line: |" .. output[#output] .. "|")
+    \end{luacode}
+  log: |
+    Last code line: |print(a)|
+    Last output line: |11|
+  pdf: 11
