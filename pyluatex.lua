@@ -70,7 +70,7 @@ end
 local function split_lines(str)
     local lines = str:splitlines()
     if lines[#lines] == "" then
-        table.remove(lines, #lines)
+        table.remove(lines)
     end
     return lines
 end
