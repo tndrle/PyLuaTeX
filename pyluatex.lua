@@ -42,6 +42,10 @@ local parent_env = nil
 local last_code = nil
 local last_output = nil
 
+local callback_handlers = {
+    post_execute = {}
+}
+
 local function get_tex_file_folder()
     for _, v in ipairs(arg) do
         if v:sub(1, 1) ~= "-" then
@@ -145,6 +149,17 @@ function pyluatex.execute(code, auto_print, write, repl_mode, store)
         last_output = output_lines
     end
 
+    for _, handler in pairs(callback_handlers["post_execute"]) do
+        handler({
+            session = pyluatex.session,
+            success = resp.success,
+            code = code_lines,
+            output = output_lines,
+            log_message = resp.log_msg,
+            repl_mode = repl_mode
+        })
+    end
+
     if pyluatex.verbose or not resp.success then
         texio.write_nl('PyLuaTeX input for session "' .. pyluatex.session ..
             '": ' .. full_code)
@@ -220,6 +235,38 @@ end
 
 function pyluatex.get_last_output()
     return last_output
+end
+
+function pyluatex.register_event_handler(event, name, handler)
+    local handlers = callback_handlers[event]
+    if handlers ~= nil then
+        if handlers[name] ~= nil then
+            show_err(
+                'Event handler "' .. name .. '" already registered' ..
+                ' for event "' .. event .. '"'
+            )
+            return
+        end
+        handlers[name] = handler
+    else
+        show_err('Unknown event "' .. event .. '"')
+    end
+end
+
+function pyluatex.unregister_event_handler(event, name)
+    local handlers = callback_handlers[event]
+    if handlers ~= nil then
+        if handlers[name] == nil then
+            show_err(
+                'Event handler "' .. name .. '" not registered' ..
+                ' for event "' .. event .. '"'
+            )
+            return
+        end
+        handlers[name] = nil
+    else
+        show_err('Unknown event "' .. event .. '"')
+    end
 end
 
 local function parse_bool(name, value)
