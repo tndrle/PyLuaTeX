@@ -124,7 +124,7 @@ local function request(data)
     return utilities.json.tolua(output)
 end
 
-function pyluatex.execute(code, auto_print, write, repl_mode, store)
+function pyluatex.execute(code, auto_print, write, repl_mode, store, catcode)
     local full_code
     if auto_print then
         full_code = "print(str(" .. code .. "), end='')"
@@ -152,7 +152,13 @@ function pyluatex.execute(code, auto_print, write, repl_mode, store)
     end
 
     if resp.success or pyluatex.ignore_errors then
-        if write then tex.print(output_lines) end
+        if write then
+            if catcode then
+                tex.print(-2, output_lines)
+            else
+                tex.print(output_lines)
+            end
+        end
     else
         show_err("Python error (see above)")
     end
@@ -163,6 +169,18 @@ end
 function pyluatex.execute_env(write, repl_mode)
     local code = table.concat(env_lines, "\n")
     pyluatex.execute(code, false, write, repl_mode, true)
+end
+
+function pyluatex.substitute(content)
+    return (content:gsub("!(v?%b{})", "\\py%1"))
+end
+
+function pyluatex.substitute_macro(content)
+    tex.print(pyluatex.substitute(content))
+end
+
+function pyluatex.substitute_env()
+    tex.print(split_lines(pyluatex.substitute(table.concat(env_lines, "\n"))))
 end
 
 local function record_line(line)

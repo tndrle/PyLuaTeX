@@ -58,6 +58,9 @@
 \newenvironment{pythonrepl}{\directlua{pyluatex.record_env("pythonrepl")}}
 {\directlua{pyluatex.execute_env(false, true)}}
 
+\newenvironment{pythonsub}{\directlua{pyluatex.record_env("pythonsub")}}
+{\directlua{pyluatex.substitute_env()}}
+
 \newcommand*{\pyluatex@inline}[3]{\directlua{pyluatex.execute([==[#1]==], #2, #3, false, true)}}
 
 \newcommand*{\py}[1]{\pyluatex@inline{#1}{true}{true}}
@@ -65,6 +68,10 @@
 
 \newcommand*{\pyc}[1]{\pyluatex@inline{#1}{false}{true}}
 \newcommand*{\pycq}[1]{\pyluatex@inline{#1}{false}{false}}
+
+\newcommand*{\pyv}[1]{\directlua{pyluatex.execute([==[#1]==], true, true, false, true, true)}}
+
+\newcommand*{\pys}[1]{\directlua{pyluatex.substitute_macro([==[#1]==])}}
 
 \newcommand*{\pysession}[1]{\directlua{pyluatex.session = [==[#1]==]}}
 \newcommand*{\pyoption}[2]{\directlua{pyluatex.set_option([==[#1]==], [==[#2]==])}}
