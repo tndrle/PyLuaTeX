@@ -1,6 +1,6 @@
 # MIT License
 #
-# Copyright (c) 2021-2024 Tobias Enderle
+# Copyright (c) 2021-2026 Tobias Enderle
 #
 # Permission is hereby granted, free of charge, to any person obtaining a
 # copy of this software and associated documentation files (the "Software"),
@@ -22,7 +22,7 @@
 
 name: Tests
 env:
-  cache-version: v4
+  cache-version: v6
 on: [push]
 jobs:
   tests:
@@ -45,14 +45,14 @@ jobs:
           echo ~/texlive/bin/universal-darwin >> $GITHUB_PATH
         fi
       shell: bash
-    - uses: actions/checkout@v3
-    - uses: actions/setup-python@v5
+    - uses: actions/checkout@v6
+    - uses: actions/setup-python@v6
       with:
-        python-version: "3.12"
+        python-version: "3.13"
         cache: pip
     - name: Install Python dependencies
       run: pip install -r test/requirements.txt
-    - uses: actions/cache@v3
+    - uses: actions/cache@v5
       id: tl-env
       with:
         path: |
@@ -69,8 +69,9 @@ jobs:
       run: |
         tlmgr option -- autobackup 0
         tlmgr update --self
-        tlmgr install pgfplots lualatex-math luacode listings
-        tlmgr install fvextra catchfile xstring framed minted
+        tlmgr paper letter
+        tlmgr install pgfplots lualatex-math luacode listings siunitx
+        tlmgr install fvextra catchfile xstring framed minted latexmk
         tlmgr remove pyluatex || true
     - name: Copy repository to LaTeX package folder
       run: |
@@ -81,12 +82,11 @@ jobs:
     - name: Run tests
       run: |
         cd test
+        texlua test-options.lua
+        texlua test-main.lua
         python3 run_special_tests.py
         python3 run_tests.py
     - name: Run examples
       run: |
-        cd example
-        for f in *.tex; do
-          lualatex --shell-escape --interaction=nonstopmode $f
-        done
-      shell: bash
+        cd test
+        python3 test_examples.py

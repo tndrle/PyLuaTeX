@@ -1,6 +1,8 @@
-pandas==2.2.3
-matplotlib==3.10.0
-Pygments==2.18.0
+pandas==3.0.2
+matplotlib==3.10.8
+Pygments==2.20.0
 Jinja2==3.1.6  # required for pandas styling
-PyYAML==6.0.2
-pdfminer.six==20240706
+PyYAML==6.0.3
+pdfminer.six==20260107
+psutil==7.2.2
+pymupdf==1.27.2.2

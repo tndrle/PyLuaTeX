@@ -1,4 +1,4 @@
-%% Copyright 2021-2024 Tobias Enderle
+%% Copyright 2021-2026 Tobias Enderle
 %%
 %% This work may be distributed and/or modified under the
 %% conditions of the LaTeX Project Public License, either version 1.3c
@@ -8,69 +8,68 @@
 %% and version 1.3c or later is part of all distributions of LaTeX
 %% version 2005/12/01 or later.
 
+% DESCRIPTION
+% Demonstrates how a Python console/REPL can be run and typeset
+
 \documentclass{article}
 
 \usepackage{pyluatex}
 \usepackage{listings}
 \usepackage{xcolor}
 \lstset{
-    language=Python,
-    breaklines=true,
-    framesep=1ex,
-    frame=lrtb,
-    framerule=0pt,
-    numbers=none,
-    basicstyle=\ttfamily,
-    keywordstyle=\bfseries\color{green!40!black},
-    stringstyle=\bfseries\color{red!80!black},
-    identifierstyle=\color{blue},
-    backgroundcolor=\color{gray!10!white},
+  language=Python,
+  breaklines=true,
+  framesep=1ex,
+  frame=lrtb,
+  framerule=0pt,
+  numbers=none,
+  basicstyle=\ttfamily,
+  keywordstyle=\bfseries\color{green!40!black},
+  stringstyle=\bfseries\color{red!80!black},
+  identifierstyle=\color{blue},
+  backgroundcolor=\color{gray!10!white},
 }
 \usepackage{luacode}
 
 \begin{luacode}
 function pytypeset()
-    tex.print("\\begin{lstlisting}")
-    tex.print(pyluatex.get_last_output())
-    tex.print("\\end{lstlisting}")
+  tex.print("\\begin{lstlisting}")
+  tex.print(pyluatex.get_last_output())
+  tex.print("\\end{lstlisting}")
 end
 \end{luacode}
 
 \newcommand{\pytypeset}{\directlua{pytypeset()}}
 
-\newenvironment{pyrepl}
-{\PyLTVerbatimEnv\begin{pythonrepl}}
-{\end{pythonrepl}\pytypeset}
+\NewDocumentEnvironment{pyrepl}{}
+{\PyLTVerbatimEnv\begin{python}[repl,quiet]}
+{\end{python}\pytypeset}
 
 \begin{filecontents*}[nosearch]{repl.py}
 def square(x):
-    return x**2
+  return x**2
 
 square(5)
 \end{filecontents*}
 
-\title{PyLuaTeX Example -- Typesetting Python Interactive Console Sessions}
-\author{Tobias Enderle}
-
 \begin{document}
 
-\maketitle
-
 PyLuaTeX allows you to run and typeset Python code in an interactive console
-or read–eval–print loop (REPL) fashion. Very much like in an interactive Python session,
+or read–eval–print loop (REPL) fashion. Much like in an interactive Python session,
 code is prefixed with \verb|>>>| (or \verb|...| in case of multi-line commands)
 and the results are added to the output buffer automatically.
 
-Both code and output are stored in PyLuaTeX's ouput buffer and can be accessed
+Both code and output are stored in PyLuaTeX's output buffer and can be accessed
 by \verb|pyluatex.get_last_output()|. In this way, you can adjust the typesetting
-to your needs. For examples on typesetting see \verb|typesetting-listings.tex|
+to your needs. For examples of typesetting, see \verb|typesetting-listings.tex|
 and \verb|typesetting-minted.tex|.
 
 In the following example, we use the custom environment \verb|pyrepl|, which is
-based on the \verb|pythonrepl| environment provided by PyLuaTeX.
+based on the \verb|python| environment provided by PyLuaTeX with the options
+\verb|repl| and \verb|quiet|.
 \begin{pyrepl}
 def fun():
-    print('Hello PyLuaTeX!')
+  print('Hello PyLuaTeX!')
 
 3 + 1 *\
 4
@@ -78,7 +77,7 @@ fun()
 \end{pyrepl}
 
 Python sessions can also be read from files:
-\pyfilerepl{repl.py}
+\pyfile[repl,quiet]{repl.py}
 \pytypeset
 
 \end{document}

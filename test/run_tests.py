@@ -1,7 +1,7 @@
 """
 MIT License
 
-Copyright (c) 2021-2024 Tobias Enderle
+Copyright (c) 2021-2026 Tobias Enderle
 
 Permission is hereby granted, free of charge, to any person obtaining a
 copy of this software and associated documentation files (the "Software"),
@@ -27,9 +27,12 @@ import subprocess
 import platform
 import uuid
 from pathlib import Path
+import filecmp
+import shutil
 import yaml
 from pdfminer.high_level import extract_text
 from pdfminer.layout import LAParams
+import pymupdf
 
 test_cases_folder = Path('test-cases')
 
@@ -84,6 +87,9 @@ class Test:
     self.expected_pdf = stripped(get_prop('pdf'))
     self.expected_log = stripped(get_prop('log'))
     self.unexpected_log = stripped(get_prop('log_not'))
+    self.expected_png = stripped(get_prop('png'))
+    if self.expected_png is not None:
+      self.expected_png = test_cases_folder / self.expected_png
     self.args = stripped(get_prop('args', ''))
     self.absolute_path = get_prop('absolute_path', False)
     assert isinstance(self.absolute_path, bool)
@@ -91,16 +97,19 @@ class Test:
 
     self.test_id = str(uuid.uuid4())
 
+  def file(self, ext):
+    return f'{self.file_stem}.{ext}'
+
   def run(self):
     # remove existing files from previous test runs
     folder = Path(self.folder)
     for f in [Path(), folder]:  # local and specified folder (can be the same)
-      for file in f.glob(f'{self.file_stem}.*'):
+      for file in f.glob(self.file('*')):
         file.unlink()
 
     if not folder.is_dir():
       folder.mkdir()
-    tex_file = folder / f'{self.file_stem}.tex'
+    tex_file = folder / self.file('tex')
     template = get_cached_template(self.template)
     tex_file.write_text(template % (self.args, self.test_id, self.code))
     # as_posix(): LaTeX wants forward slashes even on Windows
@@ -109,11 +118,15 @@ class Test:
     result = subprocess.run(self.command, capture_output=True)
 
     self.success = result.returncode == 0
-    self.log = Path(f'{self.file_stem}.log').read_text(encoding='utf-8')
-    self.pdf = read_pdf(f'{self.file_stem}.pdf')
-    self.pdf_raw = read_pdf_raw(f'{self.file_stem}.pdf')
+    self.log = Path(self.file('log')).read_text(encoding='utf-8')
+    self.pdf = read_pdf(self.file('pdf'))
+    self.pdf_raw = read_pdf_raw(self.file('pdf'))
     assert (self.pdf is None and self.pdf_raw is None) or \
       (self.pdf is not None and self.pdf_raw is not None)
+    if self.expected_png is not None:
+      with pymupdf.open(self.file('pdf')) as doc:
+        # supports only one page
+        doc[0].get_pixmap(dpi=200).save(self.file('png'))
 
   def check(self):
     passed = True
@@ -169,6 +182,11 @@ class Test:
     if self.unexpected_log is not None and self.unexpected_log in self.log:
       fail('Unexpected log output found in log file')
 
+    if self.expected_png is not None:
+      r = filecmp.cmp(self.expected_png, self.file('png'), shallow=False)
+      if not r:
+        fail('PNG files differ')
+
     return result()
 
 def load_tests(file):
@@ -177,14 +195,32 @@ def load_tests(file):
 
 
 if __name__ == '__main__':
+  if len(sys.argv) == 2:
+    # e.g. argument is "test-cases/special_tikzpicture_ref.png"
+    generate_png = sys.argv[1]
+    print('# Generating reference PNG')
+    print(generate_png)
+  else:
+    generate_png = None
+    print('# Running tests')
+
+  counter = 0
   overall_result = True
   for file in test_cases_folder.glob('*.yaml'):
     for test in load_tests(file):
-      test.run()
-      passed, message = test.check()
-      if not passed:
-        overall_result = False
-        print('#######################', file)
-        print(message)
+      if generate_png is not None:
+        if generate_png == str(test.expected_png):
+          test.run()
+          shutil.copyfile(test.file('png'), generate_png)
+          sys.exit()
+      else:
+        counter += 1
+        test.run()
+        passed, message = test.check()
+        if not passed:
+          overall_result = False
+          print('#######################', file)
+          print(message)
 
+  print(f'{counter} tests done')
   sys.exit(0 if overall_result else 1)

@@ -1,7 +1,7 @@
 """
 MIT License
 
-Copyright (c) 2021-2024 Tobias Enderle
+Copyright (c) 2021-2026 Tobias Enderle
 
 Permission is hereby granted, free of charge, to any person obtaining a
 copy of this software and associated documentation files (the "Software"),
@@ -28,6 +28,7 @@ import platform
 from os.path import isfile
 import re
 from pathlib import Path
+import psutil
 
 is_windows = platform.system() == 'Windows'
 lualatex = 'lualatex.exe' if is_windows else 'lualatex'
@@ -44,7 +45,7 @@ overall_success = True
 ############################################################
 print('#### Checking version')
 test_version = re.search(
-  r'\\ProvidesPackage{pyluatex}\[\d{4}/\d{2}/\d{2}\s+(v[\d.]+)',
+  r'\\ProvidesExplPackage{pyluatex}{\d{4}/\d{2}/\d{2}}{(v[\d.]+)}',
   (Path('..') / 'pyluatex.sty').read_text(encoding='utf-8')
 ).group(1)
 output = compile(
@@ -80,24 +81,17 @@ for arg, win_success, other_success in configs:
   success = not isfile('texput.synctex(busy)') and isfile('texput.synctex.gz')
   if (is_windows and success != win_success) or (not is_windows and success != other_success):
     overall_success = False
-    system = '' if is_windows else 'non-' 
+    system = '' if is_windows else 'non-'
     print(f'Unexpected result for argument "{arg}" on {system}Windows system')
 
 ############################################################
 print('#### Checking whether Python process is still running')
-if is_windows:
-  result = run(
-    'wmic', 'process', 'where', "name like '%python%'", 'get', 'commandline'
-  )
-else:
-  result = run('ps', 'ax')
-stdout = result.stdout.decode('utf-8').lower()
-# Heuristic to ensure that we see all relevant processes:
-# Current script must be present in running processes
-assert Path(__file__).name.lower() in stdout, stdout
-
-if 'pyluatex-interpreter.py' in stdout:
+procs = (p for p in psutil.process_iter(['cmdline']) if p.info['cmdline'])
+procs = (' '.join(p.info['cmdline']).lower() for p in procs)
+procs = ' '.join(p for p in procs if 'python' in p)
+assert Path(__file__).name.lower() in procs
+if 'pyluatex-interpreter.py' in procs:
   overall_success = False
   print('Python process still running')
 
-sys.exit(0 if overall_success else 0)
+sys.exit(0 if overall_success else 1)

@@ -1,4 +1,4 @@
-%% Copyright 2021-2024 Tobias Enderle
+%% Copyright 2021-2026 Tobias Enderle
 %%
 %% This work may be distributed and/or modified under the
 %% conditions of the LaTeX Project Public License, either version 1.3c
@@ -8,22 +8,21 @@
 %% and version 1.3c or later is part of all distributions of LaTeX
 %% version 2005/12/01 or later.
 
+% DESCRIPTION
+% Demonstrates how *matplotlib* plots can be generated and included in a
+% document
+
 \documentclass{article}
 
 \usepackage{pyluatex}
 \usepackage{graphicx}
 
-\title{PyLuaTeX Example -- Matplotlib External}
-\author{Tobias Enderle}
-
 \begin{document}
 
-\maketitle
-
-In this document we demonstrate how \emph{matplotlib} plots can be generated and
-included in a document. In the Python code in this document, the plot is
+In this document, we demonstrate how \emph{matplotlib} plots can be generated
+and included in a document. In the Python code in this document, the plot is
 configured and saved to an external PDF file. This PDF file is then
-included as picture using \verb|\includegraphics|.
+included as a picture using \verb|\includegraphics|.
 
 \begin{center}
 \begin{python}

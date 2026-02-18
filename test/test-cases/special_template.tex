@@ -1,4 +1,4 @@
-%% Copyright 2021-2024 Tobias Enderle
+%% Copyright 2021-2026 Tobias Enderle
 %%
 %% This work may be distributed and/or modified under the
 %% conditions of the LaTeX Project Public License, either version 1.3c
@@ -9,17 +9,16 @@
 %% version 2005/12/01 or later.
 
 \documentclass{article}
+\pagenumbering{gobble}
+\usepackage[%s]{pyluatex}
+\usepackage{siunitx}
+\usepackage{pgfplots}
+\pgfplotsset{compat=1.15}
 
-\usepackage{pyluatex}
-
-\newenvironment{custompy}
-{\PyLTVerbatimEnv\begin{python}}
-{\end{python}}
+\def\TESTID{%s}
+\typeout{TestID: \TESTID}
+\directlua{pdf.setinfo("/TestID (\TESTID)")}
 
 \begin{document}
-
-\begin{custompy}
-print('Hello PyLuaTeX')
-\end{custompy}
-
+%s
 \end{document}

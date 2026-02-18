@@ -22,4 +22,7 @@ FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
 IN THE SOFTWARE.
 """
 
-external_var = 11
+def func(x):
+  return 2 * x
+
+func(7)

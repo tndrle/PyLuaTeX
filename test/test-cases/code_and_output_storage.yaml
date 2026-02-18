@@ -1,6 +1,6 @@
 # MIT License
 #
-# Copyright (c) 2021-2024 Tobias Enderle
+# Copyright (c) 2021-2026 Tobias Enderle
 #
 # Permission is hereby granted, free of charge, to any person obtaining a
 # copy of this software and associated documentation files (the "Software"),
@@ -24,16 +24,30 @@ tests:
 - code: |
     \begin{pythonrepl}
     def func(x):
-      return 2 * x
+      return 3 * x
 
     func(7)
     \end{pythonrepl}
     \begin{luacode}
-      local output = pyluatex.get_last_output()
-      texio.write_nl("Last output line: |" .. output[#output] .. "|")
+      texio.write_nl(table.concat(pyluatex.get_last_output(), '\string\n'))
     \end{luacode}
   log: |
-    Last output line: |14|
+    >>> def func(x):
+    ...   return 3 * x
+    ... 
+    >>> func(7)
+    21
+- code: |
+    \pyfilerepl{test-cases/code_and_output_storage.py}
+    \begin{luacode}
+      texio.write_nl(table.concat(pyluatex.get_last_output(), '\string\n'))
+    \end{luacode}
+  log: |
+    >>> def func(x):
+    ...   return 2 * x
+    ... 
+    >>> func(7)
+    14
 - code: |
     \begin{python}
     a = 11

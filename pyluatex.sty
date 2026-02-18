@@ -1,4 +1,4 @@
-%% Copyright 2021-2024 Tobias Enderle
+%% Copyright 2021-2026 Tobias Enderle
 %%
 %% This work may be distributed and/or modified under the
 %% conditions of the LaTeX Project Public License, either version 1.3c
@@ -9,75 +9,58 @@
 %% version 2005/12/01 or later.
 
 \NeedsTeXFormat{LaTeX2e}
-\ProvidesPackage{pyluatex}[2024/01/10 v0.6.3 Execute Python code on the fly]
+\ProvidesExplPackage{pyluatex}{2024/01/10}{v0.6.3}{Execute Python code on the fly}
 
-\RequirePackage{expl3}
-\ExplSyntaxOn
-\sys_if_engine_luatex:F{
-    \PackageError{PyLuaTeX}{LuaTeX~is~required}{}
+\cs_new:Npn \__pyluatex_err:n #1 { \PackageError { PyLuaTeX } {#1} {} }
+\sys_if_engine_luatex:F { \__pyluatex_err:n { LuaTeX~is~required } }
+\sys_if_shell_unrestricted:F {
+  \__pyluatex_err:n { Shell~escape~is~required~(add~--shell-escape~option) }
 }
-\sys_if_shell_unrestricted:F{
-    \PackageError{PyLuaTeX}{Shell~escape~is~required~(add~--shell-escape~option)}{}
+
+\directlua{
+  pyluatex = require("pyluatex")
+  pyluatex.start()
 }
-\ExplSyntaxOff
 
-\directlua{require("pyluatex")}
+\cs_new:Npn \__pyluatex_env:nn #1 #2 {
+  \NewDocumentEnvironment {#1} { !O{} } { \directlua{
+    pyluatex.set_options([==[##1]==], {#2})
+    pyluatex.record_env("#1")
+  } } { \directlua{pyluatex.execute_env()} }
+}
+\__pyluatex_env:nn { python } {}
+\__pyluatex_env:nn { pythonq } { quiet = true }
+\__pyluatex_env:nn { pythonrepl } { quiet = true, repl = true }
 
-\RequirePackage{kvoptions}
-\DeclareStringOption[python3]{executable}
-\DeclareBoolOption{ignoreerrors}
-\DeclareBoolOption{verbose}
-\DeclareBoolOption[true]{localimports}
-\DeclareStringOption[veryveryend]{shutdown}
-\ProcessKeyvalOptions*
+\newcommand* { \PyLTVerbatimEnv } {
+  \directlua{pyluatex.set_parent_env([==[\@currenvir]==])}
+}
 
-\newcommand*{\pyluatex@boolopt}[1]{\csname ifpyluatex@#1\endcsname true\else false\fi}
+\cs_new:Npn \__pyluatex_cmd_inner:nn [#1] #2 { \directlua{
+  pyluatex.handle_cmd([==[#1]==], [==[#2]==])
+} }
+\cs_new:Npn \__pyluatex_cmd:Nnn #1 #2 #3 {
+  \newcommand {#1} {
+    \directlua{pyluatex.prepare_cmd_handler({#2}, pyluatex.#3)}
+    \exp_after:wN \__pyluatex_cmd_inner:nn \directlua{pyluatex.opt_arg()}
+  }
+}
+\__pyluatex_cmd:Nnn \py {} { execute_with_options, true, -1 }
+\__pyluatex_cmd:Nnn \pyq { quiet = true } { execute_with_options, true, -1 }
+\__pyluatex_cmd:Nnn \pyc {} { execute_with_options, false, -1 }
+\__pyluatex_cmd:Nnn \pycq { quiet = true } { execute_with_options, false, -1 }
+\__pyluatex_cmd:Nnn \pyif {
+  quiet = false, repl = false, store = false, ignoreerrors = false
+} { py_if }
+\__pyluatex_cmd:Nnn \pyfile {} { run_file }
+\__pyluatex_cmd:Nnn \pyfileq { quiet = true } { run_file }
+\__pyluatex_cmd:Nnn \pyfilerepl { quiet = true, repl = true } { run_file }
 
-\directlua{pyluatex.ignore_errors = \pyluatex@boolopt{ignoreerrors}}
-\directlua{pyluatex.verbose = \pyluatex@boolopt{verbose}}
-\directlua{pyluatex.start([==[\pyluatex@executable]==], \pyluatex@boolopt{localimports})}
+\newcommand { \pyoptions } [1] {
+  \directlua{pyluatex.set_options([==[#1]==], {}, true)}
+}
+\newcommand { \pyoption } [2] { \pyoptions { #1 = #2 } }
+\newcommand { \pysession } [1] { \pyoptions { session = #1 } }
 
-\ExplSyntaxOn
-\str_case_e:nnF{\pyluatex@shutdown}{
-    {veryveryend}{
-        \AddToHook{enddocument/end}{\directlua{pyluatex.shutdown()}}
-    }{veryenddocument}{
-        \AddToHook{enddocument/afteraux}{\directlua{pyluatex.shutdown()}}
-    }{off}{}
-}{\PackageError{PyLuaTeX}{Invalid~value~for~package~option~"shutdown":~\pyluatex@shutdown}{}}
-\ExplSyntaxOff
-
-\newcommand*{\PyLTVerbatimEnv}{\directlua{pyluatex.set_parent_env([==[\@currenvir]==])}}
-
-\newenvironment{python}{\directlua{pyluatex.record_env("python")}}
-{\directlua{pyluatex.execute_env(true, false)}}
-
-\newenvironment{pythonq}{\directlua{pyluatex.record_env("pythonq")}}
-{\directlua{pyluatex.execute_env(false, false)}}
-
-\newenvironment{pythonrepl}{\directlua{pyluatex.record_env("pythonrepl")}}
-{\directlua{pyluatex.execute_env(false, true)}}
-
-\newcommand*{\pyluatex@inline}[3]{\directlua{pyluatex.execute([==[#1]==], #2, #3, false, true)}}
-
-\newcommand*{\py}[1]{\pyluatex@inline{#1}{true}{true}}
-\newcommand*{\pyq}[1]{\pyluatex@inline{#1}{true}{false}}
-
-\newcommand*{\pyc}[1]{\pyluatex@inline{#1}{false}{true}}
-\newcommand*{\pycq}[1]{\pyluatex@inline{#1}{false}{false}}
-
-\newcommand*{\pysession}[1]{\directlua{pyluatex.session = [==[#1]==]}}
-\newcommand*{\pyoption}[2]{\directlua{pyluatex.set_option([==[#1]==], [==[#2]==])}}
-
-\newcommand*{\pyfile}[1]{\directlua{pyluatex.run_file([==[#1]==], true, false)}}
-\newcommand*{\pyfileq}[1]{\directlua{pyluatex.run_file([==[#1]==], false, false)}}
-\newcommand*{\pyfilerepl}[1]{\directlua{pyluatex.run_file([==[#1]==], false, true)}}
-
-\newcommand*{\pyif}[1]{%
-    \ifnum1=\directlua{pyluatex.execute([==['1' if (#1) else '0']==], true, true, false, false)}\relax
-        \expandafter\@firstoftwo
-    \else
-        \expandafter\@secondoftwo
-    \fi}
-
+\let\@unprocessedoptions\relax % https://tex.stackexchange.com/a/615863
 \endinput

@@ -1,0 +1,153 @@
+# MIT License
+#
+# Copyright (c) 2021-2026 Tobias Enderle
+#
+# Permission is hereby granted, free of charge, to any person obtaining a
+# copy of this software and associated documentation files (the "Software"),
+# to deal in the Software without restriction, including without limitation
+# the rights to use, copy, modify, merge, publish, distribute, sublicense,
+# and/or sell copies of the Software, and to permit persons to whom the
+# Software is furnished to do so, subject to the following conditions:
+#
+# The above copyright notice and this permission notice shall be included
+# in all copies or substantial portions of the Software.
+#
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
+# OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+# FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
+# IN THE SOFTWARE.
+
+tests:
+- id: options2
+  code: |
+    \begin{python}[ignoreerrors]
+      print(1 / 0)
+    \end{python}
+  pdf: |
+    Traceback (most recent call last): File ”<input>”, line 1, in <module>
+
+    ZeroDivisionError: division by zero
+  log: |
+    PyLuaTeX input for session "default":   print(1 / 0)
+    PyLuaTeX output: Traceback (most recent call last):
+      File "<input>", line 1, in <module>
+    ZeroDivisionError: division by zero
+- id: custom-env
+  code: |
+    \NewDocumentEnvironment{custompy}{}
+    {\PyLTVerbatimEnv\begin{python}}
+    {\end{python}}
+
+    \begin{custompy} % hide line
+      print('Hello PyLuaTeX') # hide line
+    \end{custompy} % hide line
+  pdf: Hello PyLuaTeX
+- id: logging
+  code: |
+    \begin{python}
+      tex.log('This text goes to the LaTeX log.')
+    \end{python}
+  log: |
+    This text goes to t
+    he LaTeX log.
+- id: ex-py-1
+  code: \py{3 + 7}
+  pdf: 10
+- id: ex-pyc-1
+  code: |
+    \pyc{x = 5}
+    \py{x} % hide line
+  pdf: 5
+- id: ex-pyc-2
+  code: \pyc{print('hello')}
+  pdf: hello
+- id: ex-pyif-1
+  code: |
+    \pyc{a = 1} % hide line
+    \pyif{a == 1}{$a = 1$}{$a \neq 1$}
+  pdf: a = 1
+- id: ex-pyoptions-1
+  code: |
+    \pyoptions{verbose,session=main}
+    \py{1} % hide line
+  pdf: 1
+  log: |
+    PyLuaTeX input for session "main": print(str(1), end='')
+    PyLuaTeX output: 1
+- id: ex-pyq-1
+  code: |
+    A % hide line
+    \pyq{3 + 7}
+  pdf: A
+- id: ex-pycq-1
+  code: |
+    \pycq{x = 5}
+    \py{x} % hide line
+  pdf: 5
+- id: ex-pysession-1
+  code: |
+    \pysession{main}
+    \pyoptions{verbose} % hide line
+    \py{1} % hide line
+  pdf: 1
+  log: |
+    PyLuaTeX input for session "main": print(str(1), end='')
+    PyLuaTeX output: 1
+- id: ex-pyoption-1
+  code: |
+    \pyoption{verbose}{true}
+    \py{1} % hide line
+  pdf: 1
+  log: |
+    PyLuaTeX input for session "default": print(str(1), end='')
+    PyLuaTeX output: 1
+- id: ex-python-1
+  code: |
+    \begin{python}
+      x = 'Hello PyLuaTeX'
+      print(x)
+    \end{python}
+  pdf: Hello PyLuaTeX
+- id: ex-ignoreerrors-1
+  code: \py[ignore errors]{1 / 0}
+  pdf: |
+    Traceback (most recent call last): File ”<input>”, line 1, in <module>
+
+    ZeroDivisionError: division by zero
+  log: |
+    ZeroDivisionError: division by zero
+- id: ex-quiet-1
+  code: |
+    A % hide line
+    \py[quiet]{7 + 4}
+  pdf: A
+- id: ex-quiet-2
+  code: |
+    A % hide line
+    \py[q]{'Hello'}
+  pdf: A
+- id: ex-verbose-1
+  code: \py[verbose]{7 + 4}
+  pdf: 11
+  log: |
+    PyLuaTeX input for session "default": print(str(7 + 4), end='')
+    PyLuaTeX output: 11
+- id: ex-session-1
+  code: |
+    \pyc[session=main]{x = 5}
+    \py[s=main]{x} % hide line
+  pdf: 5
+- id: ex-session-2
+  code: |
+    \pyc[session=main]{x = 5} % hide line
+    \py[s=main]{x}
+  pdf: 5
+- id: ex-store-1
+  code: |
+    \pyc[store=false]{x = 5}
+    \directlua{texio.write_nl(">>>>> " .. tostring(pyluatex.get_last_code()))} % hide line
+  log: |
+    >>>>> nil

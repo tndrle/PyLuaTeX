@@ -1,6 +1,6 @@
 # MIT License
 #
-# Copyright (c) 2021-2024 Tobias Enderle
+# Copyright (c) 2021-2026 Tobias Enderle
 #
 # Permission is hereby granted, free of charge, to any person obtaining a
 # copy of this software and associated documentation files (the "Software"),
@@ -26,6 +26,15 @@ tests:
     \py{external_var}
   pdf: 11
 - code: |
+    \pyfile[]{test-cases/external.py}
+    \py{external_var}
+  pdf: 11
+- success: false
+  code: |
+    \pyfile{ test-cases/external.py}
+    \py{external_var}
+  log: '! Package PyLuaTeX Error: File " test-cases/external.py" not found.'
+- code: |
     \pyfileq{\py{'test-cases/external.py'}}
     \py{external_var}
   pdf: 11
@@ -44,3 +53,6 @@ tests:
     \pyc{b = 8}
     \pyfileq{test-cases/external_2.py}
   pdf: a
+- success: false
+  code: \pyfile{wrong_filename.py}
+  log: '! Package PyLuaTeX Error: File "wrong_filename.py" not found.'

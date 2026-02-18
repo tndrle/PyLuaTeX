@@ -1,4 +1,4 @@
-%% Copyright 2021-2024 Tobias Enderle
+%% Copyright 2021-2026 Tobias Enderle
 %%
 %% This work may be distributed and/or modified under the
 %% conditions of the LaTeX Project Public License, either version 1.3c
@@ -8,6 +8,9 @@
 %% and version 1.3c or later is part of all distributions of LaTeX
 %% version 2005/12/01 or later.
 
+% DESCRIPTION
+% The code typesetting example below
+
 \documentclass{article}
 
 \usepackage{pyluatex}
@@ -16,28 +19,28 @@
 
 \begin{luacode}
 function pytypeset()
-    tex.print("\\begin{lstlisting}[language=Python]")
-    tex.print(pyluatex.get_last_code())
-    tex.print("\\end{lstlisting}")
-    tex.print("") -- ensure newline
+  tex.print("\\begin{lstlisting}[language=Python]")
+  tex.print(pyluatex.get_last_code())
+  tex.print("\\end{lstlisting}")
+  tex.print("") -- ensure newline
 end
 \end{luacode}
 
 \newcommand*{\pytypeset}{%
-    \noindent\textbf{Input:}
-    \directlua{pytypeset()}
-    \textbf{Output:}
-    \begin{center}
-        \directlua{tex.print(pyluatex.get_last_output())}
-    \end{center}
+  \noindent\textbf{Input:}
+  \directlua{pytypeset()}
+  \textbf{Output:}
+  \begin{center}
+    \directlua{tex.print(pyluatex.get_last_output())}
+  \end{center}
 }
 
 \begin{document}
 
-\begin{pythonq}
-greeting = 'Hello PyLuaTeX!'
-print(greeting)
-\end{pythonq}
+\begin{python}[quiet]
+  greeting = 'Hello PyLuaTeX!'
+  print(greeting)
+\end{python}
 \pytypeset
 
 \end{document}

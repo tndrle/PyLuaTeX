@@ -1,6 +1,6 @@
 # MIT License
 #
-# Copyright (c) 2021-2024 Tobias Enderle
+# Copyright (c) 2021-2026 Tobias Enderle
 #
 # Permission is hereby granted, free of charge, to any person obtaining a
 # copy of this software and associated documentation files (the "Software"),
@@ -39,6 +39,6 @@ tests:
   log: test-4-{}-[]<
 - success: false
   code: |
-    % logged text appears in TeX log even though there is a Python error
+    % logged text appears in LaTeX log even though there is a Python error
     \pyc{tex.log('PyLuaTeX', 'log test'); print(a)}
   log: PyLuaTeX log test

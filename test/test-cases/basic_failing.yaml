@@ -1,6 +1,6 @@
 # MIT License
 #
-# Copyright (c) 2021-2024 Tobias Enderle
+# Copyright (c) 2021-2026 Tobias Enderle
 #
 # Permission is hereby granted, free of charge, to any person obtaining a
 # copy of this software and associated documentation files (the "Software"),
@@ -65,8 +65,15 @@ tests:
     ! Package PyLuaTeX Error: Python error (see above).
 - code: |
     \pyc{a = 1}
-    \pysession{a}
+    \pysession{other}
     \py{print(a)}
+  log: |
+    NameError: name 'a' is not defined
+
+    ! Package PyLuaTeX Error: Python error (see above).
+- code: |
+    \pyc{a = 1}
+    \py[s=other]{print(a)}
   log: |
     NameError: name 'a' is not defined
 
@@ -84,3 +91,13 @@ tests:
     ! Package PyLuaTeX Error: Python error (see above).
 - code: \begin{python} \end{python}
   log: '*** (job aborted, no legal \end found)'
+- code: |
+    \pyc{tex.log('log info'); a = b}
+  log: |
+    PyLuaTeX input for session "default": tex.log('log info'); a = b
+    PyLuaTeX output: Traceback (most recent call last):
+      File "<input>", line 1, in <module>
+    NameError: name 'b' is not defined
+    log info
+
+    ! Package PyLuaTeX Error: Python error (see above).

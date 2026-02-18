@@ -1,4 +1,4 @@
-%% Copyright 2021-2024 Tobias Enderle
+%% Copyright 2021-2026 Tobias Enderle
 %%
 %% This work may be distributed and/or modified under the
 %% conditions of the LaTeX Project Public License, either version 1.3c
@@ -8,12 +8,12 @@
 %% and version 1.3c or later is part of all distributions of LaTeX
 %% version 2005/12/01 or later.
 
+% DESCRIPTION
+% Demonstrates the use of different Python sessions in a document
+
 \documentclass{article}
 
 \usepackage{pyluatex}
-
-\title{PyLuaTeX Example -- Sessions}
-\author{Tobias Enderle}
 
 \pysession{session-a}
 \pyc{greeting = "Hi, I'm session A"}
@@ -24,12 +24,10 @@
 
 \begin{document}
 
-\maketitle
-
-In this document the use of sessions is demonstrated.
+In this document, the use of sessions is demonstrated.
 Sessions provide a way to structure and separate code.
 Variables, function definitions, etc. of one session are only accessible
-by that very session.
+by that session.
 This can be helpful if you have long documents with a lot of code.
 
 \paragraph{Session A}
@@ -46,9 +44,9 @@ The variable \texttt{var} is only defined in session A, therefore
 an error is printed here:
 \begin{python}
 try:
-    print(var)
+  print(var)
 except NameError as e:
-    print(e)
+  print(e)
 \end{python}
 
 \end{document}

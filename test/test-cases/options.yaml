@@ -1,6 +1,6 @@
 # MIT License
 #
-# Copyright (c) 2021-2024 Tobias Enderle
+# Copyright (c) 2021-2026 Tobias Enderle
 #
 # Permission is hereby granted, free of charge, to any person obtaining a
 # copy of this software and associated documentation files (the "Software"),
@@ -23,7 +23,7 @@
 tests:
 - success: false
   code: \pyoption{foo}{true}
-  log: '! Package PyLuaTeX Error: Unknown option "foo".'
+  log: '! Package PyLuaTeX Error: Invalid option: "foo".'
 - code: \pyoption{verbose}{true}
 - code: \pyoption{verbose}{false}
 - code: \pyoption{verbose}{ true}
@@ -41,4 +41,113 @@ tests:
 - code: \pyoption{ignoreerrors}{false}
 - success: false
   code: \pyoption{verbose}{foo}
-  log: '! Package PyLuaTeX Error: Invalid value "foo" for option "verbose".'
+  log: |
+    ! Package PyLuaTeX Error: Option "verbose" must be "true" or "false" but is "fo
+    o".
+- code: |
+    \pyoptions{verbose,,  ,  ignore errors, session=test}
+    \py{1}
+    \py{a}
+  log: |
+    PyLuaTeX input for session "test": print(str(a), end='')
+    PyLuaTeX output: Traceback (most recent call last):
+      File "<input>", line 1, in <module>
+    NameError: name 'a' is not defined
+  pdf: |
+    1 Traceback (most recent call last): File ”<input>”, line 1, in <module>
+
+    NameError: name ’a’ is not defined
+- code: \py{1} \py[quiet]{2} \py{3}
+  pdf: 1 3
+- code: \pyc[session=x]{a = 7} \pyc{a = 3} \py[session=x]{a}
+  pdf: 7
+- success: false
+  code: \py[ session ]{7}
+  log: '! Package PyLuaTeX Error: Value missing for option "session".'
+- code: |
+    \pyc[verbose,
+    quiet]{a = 7}
+    \py{a}
+  log: |
+    PyLuaTeX input for session "default": a = 7
+  pdf: 7
+- success: false
+  code: \pyq[quiet=false]{7}
+  log: '! Package PyLuaTeX Error: Option "quiet" not allowed here.'
+- success: false
+  code: \py[session=tes"t]{1}
+  log: '! Package PyLuaTeX Error: Invalid option string: "session=tes"t".'
+- code: |
+    \pyc[s=main]{a = 'test'}
+    \begin{python}[
+      session = main
+    ]
+      print(a)
+    \end{python}
+  pdf: test
+- code: |
+    \pyc[s=main]{x = 8}
+    \py   [verbose,
+
+    s=main]  {x}
+  log: |
+    PyLuaTeX input for session "main": print(str(x), end='')
+    PyLuaTeX output: 8
+  pdf: 8
+- code: |
+    \begin{python}[session=|]
+      a = 1
+    \end{python}
+    \py[s=|]{a}
+  pdf: 1
+- code: |
+    \begin{python}[session="main,session", verbose]
+      print(7)
+    \end{python}
+  log: |
+    PyLuaTeX input for session "main,session":   print(7)
+  pdf: 7
+- code: |
+    \pyc[session="main,session", verbose]{print(7)}
+  log: |
+    PyLuaTeX input for session "main,session": print(7)
+  pdf: 7
+- code: |
+    \pyc[session={main}, verbose]{print(7)}
+  log: |
+    PyLuaTeX input for session "{main}": print(7)
+  pdf: 7
+- code: |
+    \newcommand{\testfoo}[1]{session #1}
+    \pyc[session=\testfoo{main}, verbose]{print(7)}
+  log: |
+    PyLuaTeX input for session "session main": print(7)
+  pdf: 7
+- code: |
+    \newcommand{\testfoo}[1]{session       #1}
+    \pyc[session="\testfoo{main}", verbose]{print(7)}
+  log: |
+    PyLuaTeX input for session "session main": print(7)
+  pdf: 7
+- code: |
+    \pyc[session=main=foo, verbose]{print(7)}
+  log: |
+    PyLuaTeX input for session "main=foo": print(7)
+  pdf: 7
+- success: false
+  code: |
+    \begin{python}
+      [session = main]
+      print(1)
+    \end{python}
+  log: |2
+      File "<input>", line 1
+        [session = main]
+         ^^^^^^^^^^^^^^
+- code: |
+    \begin{python} [session = main]
+      print(1)
+    \end{python}
+  pdf: |
+    [session = main]
+    1

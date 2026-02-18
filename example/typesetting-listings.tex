@@ -1,4 +1,4 @@
-%% Copyright 2021-2024 Tobias Enderle
+%% Copyright 2021-2026 Tobias Enderle
 %%
 %% This work may be distributed and/or modified under the
 %% conditions of the LaTeX Project Public License, either version 1.3c
@@ -8,82 +8,81 @@
 %% and version 1.3c or later is part of all distributions of LaTeX
 %% version 2005/12/01 or later.
 
+% DESCRIPTION
+% A detailed example for typesetting code and output with the *listings*
+% package
+
 \documentclass{article}
 
 \usepackage{pyluatex}
 \usepackage{listings}
 \usepackage{xcolor}
 \lstset{
-    language=Python,
-    breaklines=true,
-    framesep=1ex,
-    frame=lrtb,
-    framerule=0pt,
-    numbers=none,
-    basicstyle=\ttfamily,
-    keywordstyle=\bfseries\color{green!40!black},
-    stringstyle=\bfseries\color{red!80!black},
-    identifierstyle=\color{blue},
-    backgroundcolor=\color{gray!10!white},
+  language=Python,
+  breaklines=true,
+  framesep=1ex,
+  frame=lrtb,
+  framerule=0pt,
+  numbers=none,
+  basicstyle=\ttfamily,
+  keywordstyle=\bfseries\color{green!40!black},
+  stringstyle=\bfseries\color{red!80!black},
+  identifierstyle=\color{blue},
+  backgroundcolor=\color{gray!10!white},
 }
 
 \usepackage{luacode}
 \begin{luacode}
 function pytypeset()
-    tex.print("\\begin{lstlisting}")
-    tex.print(pyluatex.get_last_code())
-    tex.print("\\end{lstlisting}")
+  tex.print("\\begin{lstlisting}")
+  tex.print(pyluatex.get_last_code())
+  tex.print("\\end{lstlisting}")
 end
 
 function pytypeset_inline()
-    -- assume there is only one line of code in get_last_code()
-    tex.print("\\lstinline[columns=fixed]@" .. pyluatex.get_last_code()[1] .. "@")
+  -- assume there is only one line of code in get_last_code()
+  tex.print("\\lstinline[columns=fixed]@" .. pyluatex.get_last_code()[1] .. "@")
 end
 \end{luacode}
 
 \newcommand*{\pytypeset}{%
-    \noindent\textbf{Input:}
-    \directlua{pytypeset()}
-    \textbf{Output:}
-    \begin{center}
-        \directlua{tex.print(pyluatex.get_last_output())}
-    \end{center}
+  \noindent\textbf{Input:}
+  \directlua{pytypeset()}
+  \textbf{Output:}
+  \begin{center}
+    \directlua{tex.print(pyluatex.get_last_output())}
+  \end{center}
 }
 \newcommand*{\coderaw}{\directlua{tex.print(pyluatex.get_last_code())}}
 \newcommand*{\codeinline}{\directlua{pytypeset_inline()}}
 \newcommand*{\outputraw}{\directlua{tex.print(pyluatex.get_last_output())}}
 
-\title{PyLuaTeX Example -- Typesetting Code Using the \emph{listings} Package}
-\author{Tobias Enderle}
-
 \begin{document}
 
-\maketitle
-
-\section*{Typesetting of Code Blocks and Ouput}
-\begin{pythonq}
+\section*{Typesetting of Code Blocks and Output}
+\begin{python}[q]
 msg = 'Hello'
 
 print(msg)
-\end{pythonq}
+\end{python}
 \pytypeset
 
-\section*{Typesetting of Inline Code and Ouput}
-Calling \pycq{print('test', end='')}\codeinline\ in Python outputs ``\outputraw''.
+\section*{Typesetting of Inline Code and Output}
+Calling \pyc[q]{print('test', end='')}\codeinline\ in Python outputs ``\outputraw''.
 
 \begin{python}
 x = 4
 \end{python}
-The value of \pyq{x}\codeinline\ is \outputraw.
+The value of \py[q]{x}\codeinline\ is \outputraw.
 
-The result of \pyq{17 + 300}$\coderaw$ is \outputraw.
+The result of \py[q]{17 + 300}$\coderaw$ is \outputraw.
 
 \section*{Custom Environments}
 You can create a custom environment for typesetting:
 
-\newenvironment{typesetpython}
-{\PyLTVerbatimEnv\begin{pythonq}}
-{\end{pythonq}\pytypeset}
+\NewDocumentEnvironment{typesetpython}{}
+{\PyLTVerbatimEnv\begin{python}[q]}
+{\end{python}\pytypeset}
 
 \begin{typesetpython}
 msg = 'Custom environment'

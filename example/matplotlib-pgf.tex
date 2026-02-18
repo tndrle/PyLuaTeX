@@ -1,4 +1,4 @@
-%% Copyright 2021-2024 Tobias Enderle
+%% Copyright 2021-2026 Tobias Enderle
 %%
 %% This work may be distributed and/or modified under the
 %% conditions of the LaTeX Project Public License, either version 1.3c
@@ -8,6 +8,10 @@
 %% and version 1.3c or later is part of all distributions of LaTeX
 %% version 2005/12/01 or later.
 
+% DESCRIPTION
+% Demonstrates how *matplotlib* plots can be generated and included in a
+% document using *PGF*
+
 \documentclass{article}
 
 \usepackage{pyluatex}
@@ -15,15 +19,10 @@
 \usepackage{pgf}
 \usepackage{url}
 
-\title{PyLuaTeX Example -- Matplotlib PGF}
-\author{Tobias Enderle}
-
 \begin{document}
 
-\maketitle
-
-In this document we demonstrate how \emph{matplotlib} plots can be generated and
-included in a document. In the Python code in this document, the plot is
+In this document, we demonstrate how \emph{matplotlib} plots can be generated
+and included in a document. In the Python code in this document, the plot is
 configured and saved to PGF\footnote{\url{https://ctan.org/pkg/pgf}} code.
 The PGF code is then included in the document and creates the plot.
 
@@ -50,12 +49,12 @@ ax.set(xlabel='time (s)', ylabel='voltage (mV)',
 ax.grid()
 
 with io.StringIO() as file:  # save to "in-memory file"
-    fig.savefig(file, format='pgf', bbox_inches='tight', pad_inches=0.1)
-    print(file.getvalue())
+  fig.savefig(file, format='pgf', bbox_inches='tight', pad_inches=0.1)
+  print(file.getvalue())
 \end{python}
 \end{center}
 
-For an alternative approach of creating plots with \emph{matplotlib},
+For an alternative approach to creating plots with \emph{matplotlib},
 consider the example \verb|matplotlib-external.tex|.
 
 \end{document}

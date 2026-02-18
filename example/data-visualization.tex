@@ -1,4 +1,4 @@
-%% Copyright 2021-2024 Tobias Enderle
+%% Copyright 2021-2026 Tobias Enderle
 %%
 %% This work may be distributed and/or modified under the
 %% conditions of the LaTeX Project Public License, either version 1.3c
@@ -7,6 +7,9 @@
 %%   http://www.latex-project.org/lppl.txt
 %% and version 1.3c or later is part of all distributions of LaTeX
 %% version 2005/12/01 or later.
+
+% DESCRIPTION
+% Demonstrates the visualization of data using *pgfplots* and *pandas*
 
 \documentclass{article}
 
@@ -20,17 +23,16 @@
 
 \begin{python}
 import pandas as pd
-import datetime
 
 def pgf_coords(x, y):
-    return ' '.join(f'({a},{b})' for a, b in zip(x, y))
+  return ' '.join(f'({a},{b})' for a, b in zip(x, y))
 
 file = 'population.csv'
 df = pd.read_csv(file)
 data = df.set_index(['Location', 'Time']).sort_index()
 world_data = data.loc['World']
 
-year = datetime.datetime.now().year
+year = 2026
 current_pop = world_data.loc[year].PopTotal
 
 diffs = world_data.PopTotal.diff()
@@ -38,12 +40,7 @@ highest_increase_year = diffs.idxmax()
 highest_increase = diffs.max() / 1e3
 \end{python}
 
-\title{PyLuaTeX Example -- Data Visualization}
-\author{Tobias Enderle}
-
 \begin{document}
-
-\maketitle
 
 This document demonstrates how data can be visualized flexibly in a \LaTeX{}
 document with the help of the Python package \emph{pandas} and the \LaTeX{}
@@ -63,17 +60,17 @@ and \py{df.Time.iloc[-1]}. The red lines mark the current year and population.
 \begin{center}
 \begin{tikzpicture}
 \begin{axis}[
-    width=\textwidth,
-    height=0.7\textwidth,
-    enlarge x limits=false,
-    ymin=0,
-    ylabel={Estimated world population in billions},
-    xlabel={Year},
-    xticklabel style={/pgf/number format/1000 sep=},
-    grid=both,
+  width=\textwidth,
+  height=0.7\textwidth,
+  enlarge x limits=false,
+  ymin=0,
+  ylabel={Estimated world population in billions},
+  xlabel={Year},
+  xticklabel style={/pgf/number format/1000 sep=},
+  grid=both,
 ]
 \addplot[no marks,black,thick] coordinates {
-    \py{pgf_coords(world_data.index, world_data.PopTotal / 1e6)}
+  \py{pgf_coords(world_data.index, world_data.PopTotal / 1e6)}
 };
 \draw[red,thick] (axis cs:\py{year},0) |- (axis cs:0,\py{current_pop / 1e6});
 \end{axis}
@@ -92,11 +89,11 @@ table_data = world_data.iloc[::10].reset_index()
 table_data = table_data[['Time', 'PopTotal', 'PopMale', 'PopFemale']]
 table_data.columns = ['Year', 'Total (thousands)', 'Male (thousands)', 'Female (thousands)']
 table = table_data.style.hide(axis='index').format(
-    formatter={
-        'Total (thousands)': '{:,.0f}',
-        'Male (thousands)': '{:,.0f}',
-        'Female (thousands)': '{:,.0f}'
-    }
+  formatter={
+    'Total (thousands)': '{:,.0f}',
+    'Male (thousands)': '{:,.0f}',
+    'Female (thousands)': '{:,.0f}'
+  }
 ).to_latex(hrules=True)
 print(table)
 \end{python}
@@ -108,27 +105,27 @@ of America (USA). The numbers are given in millions.
 \begin{python}
 marker_year = 2030
 plots = [
-    ('China', data.loc['China'].PopTotal / 1e3),
-    ('USA', data.loc['United States of America'].PopTotal / 1e3)
+  ('China', data.loc['China'].PopTotal / 1e3),
+  ('USA', data.loc['United States of America'].PopTotal / 1e3)
 ]
 \end{python}
 \begin{tikzpicture}
 \begin{axis}[
-    width=\textwidth,
-    height=0.55\textwidth,
-    enlarge x limits=false,
-    ymin=0,
-    ylabel={Estimated population in millions},
-    xlabel={Year},
-    xticklabel style={/pgf/number format/1000 sep=},
-    grid=both,
+  width=\textwidth,
+  height=0.55\textwidth,
+  enlarge x limits=false,
+  ymin=0,
+  ylabel={Estimated population in millions},
+  xlabel={Year},
+  xticklabel style={/pgf/number format/1000 sep=},
+  grid=both,
 ]
 \pgfplotsinvokeforeach{0,1}{
-    \addplot[no marks,black,thick] coordinates {
-        \py{pgf_coords(plots[#1][1].index, plots[#1][1])}
-    };
-    \node[below] at (axis cs:\py{marker_year},\py{plots[#1][1].loc[marker_year]})
-        {\py{plots[#1][0]}};
+  \addplot[no marks,black,thick] coordinates {
+    \py{pgf_coords(plots[#1][1].index, plots[#1][1])}
+  };
+  \node[below] at (axis cs:\py{marker_year},\py{plots[#1][1].loc[marker_year]})
+    {\py{plots[#1][0]}};
 }
 \end{axis}
 \end{tikzpicture}

@@ -1,0 +1,183 @@
+# MIT License
+#
+# Copyright (c) 2021-2026 Tobias Enderle
+#
+# Permission is hereby granted, free of charge, to any person obtaining a
+# copy of this software and associated documentation files (the "Software"),
+# to deal in the Software without restriction, including without limitation
+# the rights to use, copy, modify, merge, publish, distribute, sublicense,
+# and/or sell copies of the Software, and to permit persons to whom the
+# Software is furnished to do so, subject to the following conditions:
+#
+# The above copyright notice and this permission notice shall be included
+# in all copies or substantial portions of the Software.
+#
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
+# OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+# FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
+# IN THE SOFTWARE.
+
+
+# For (additional) examples see readme-examples.yaml (they will be added to the
+# readme file during the generation process in generate_readme.py)
+
+reference:
+  commands:
+  - name: py
+    call: \py[<options>]{<code>}
+    desc: |
+      Executes (object-like) `<code>` and writes its string representation to
+      the document.
+  - name: pyc
+    call: \pyc[<options>]{<code>}
+    desc: |
+      Executes `<code>`. Output (e.g. from a call to `print()`) is written to
+      the document.
+  - name: pyfile
+    call: \pyfile[<options>]{<path>}
+    desc: |
+      Executes the Python file specified by `<path>`.
+      Output (e.g. from a call to `print()`) is written to the document.
+    examples:
+    - \pyfile{main.py}
+  - name: pyif
+    call: \pyif[<options>]{<test>}{<then clause>}{<else clause>}
+    desc: |
+      Evaluates the Python boolean expression `<test>`, and then executes either
+      the LaTeX code in `<then clause>` or the LaTeX code in `<else clause>`.
+  - name: pyoptions
+    call: \pyoptions{<options>}
+    desc: |
+      Sets options globally.
+      For more information see the [Options](#options) section.
+  commands_compat:
+  - name: pyq
+    call: \pyq[<options>]{<code>}
+    desc: |
+      Executes (object-like) `<code>`. Any output to the document is suppressed.
+    equivalent: \py[quiet,<options>]{<code>}
+  - name: pycq
+    call: \pycq[<options>]{<code>}
+    desc: Executes `<code>`. Any output to the document is suppressed.
+    equivalent: \pyc[quiet,<options>]{<code>}
+  - name: pyfileq
+    call: \pyfileq[<options>]{<path>}
+    desc: |
+      Executes the Python file specified by `<path>`. Any output to the
+      document is suppressed.
+    equivalent: \pyfile[quiet,<options>]{<path>}
+    examples:
+    - \pyfileq{main.py}
+  - name: pysession
+    call: \pysession{<name>}
+    desc: |
+      Sets `<name>` globally as Python session for subsequent Python code.
+      The session that is active at the beginning is `default`.
+    equivalent: \pyoptions{session=<name>}
+    options: false
+  - name: pyoption
+    call: \pyoption{<option>}{<value>}
+    desc: |
+      Assigns `<value>` to the option `<option>` globally.
+      For more information see the [Options](#options) section.
+    equivalent: \pyoptions{<option>=<value>}
+  environments:
+  - name: python
+    desc: |
+      Executes the provided block of Python code.
+      The environment handles characters like `_`, `#`, `%`, `\`, etc.
+      Code on the same line as `\begin{python}` is ignored, i.e., code must
+      start on the next line.
+      If leading spaces are present, they are gobbled automatically up to the
+      first level of indentation.
+  environments_compat:
+  - name: pythonq
+    desc: |
+      Same as the `python` environment, but any output to the document is
+      suppressed.
+    equivalent: \begin{python}[quiet,<options>]
+  - name: pythonrepl
+    desc: |
+      Executes the provided block of Python code in an interactive console/REPL.
+      Code and output are stored together in the output buffer and can be
+      typeset as explained in the section [Typesetting Code](#typesetting-code)
+      or as shown in the example `repl.tex` in the folder `example`.
+    equivalent: \begin{python}[quiet,repl,<options>]
+  options:
+  - name: executable
+    type: string
+    desc: Specifies the path to the Python executable.
+    examples:
+    - \usepackage[executable=/usr/local/bin/python3]{pyluatex}
+  - name: ignoreerrors
+    type: boolean
+    desc: |
+      By default, PyLuaTeX aborts the compilation process when Python reports an
+      error. If the `ignoreerrors` option is set, the compilation process is not
+      aborted.
+    examples:
+    - \usepackage[ignoreerrors]{pyluatex}
+  - name: localimports
+    type: boolean
+    desc: |
+      If this option is set, the folder containing the LaTeX input file is added
+      to the Python path. This allows local Python packages to be imported.
+    examples:
+    - \usepackage[localimports=false]{pyluatex}
+  - name: quiet
+    type: boolean
+    desc: |
+      If this option is set, any output to the document is suppressed, even if
+      the Python code explicitly calls `print()`. This is helpful if you want
+      to process code or output further and do your own typesetting. For an
+      example, see the [Typesetting Code](#typesetting-code) section.
+  - name: repl
+    type: boolean
+    desc: |
+      If this option is set, Python code is executed in an interactive
+      console/REPL. Code and output are stored together in the output buffer
+      and can be typeset as explained in the section
+      [Typesetting Code](#typesetting-code) or as shown in the example
+      `repl.tex` in the folder `example`. The use of `quiet` together with
+      `repl` is recommended.
+  - name: session
+    type: boolean
+    desc: |
+      Sessions provide a way to structure and separate code.
+      Variables, function definitions, etc. of one session are only accessible
+      by that session. This can be helpful in long documents
+      with a lot of code.
+  - name: shutdown
+    type: choice
+    desc: |
+      Specifies when the Python process is shut down.<br>
+      *Possible values:* `veryveryend`, `veryenddocument`, `off`<br>
+      PyLuaTeX shuts down the Python interpreter when the compilation is done.
+      With the option `veryveryend`, Python is shut down in the
+      `enddocument/end` hook. With the option `veryenddocument`, Python is shut
+      down in the `enddocument/afteraux` hook. With the option `off`, Python is
+      not shut down explicitly. However, the Python process will shut down when
+      the LuaTeX process finishes even if `off` is selected. Using `off` on
+      Windows might lead to problems with SyncTeX, though
+      (https://github.com/tndrle/PyLuaTeX/issues/8).<br>
+      Before v0.6.2, PyLuaTeX used the hooks `\AtVeryVeryEnd` and
+      `\AtVeryEndDocument` of the package *atveryend*. The new hooks
+      `enddocument/end` and `enddocument/afteraux` are equivalent to those of
+      the *atveryend* package.
+    examples:
+    - \usepackage[shutdown=veryenddocument]{pyluatex}
+  - name: store
+    type: boolean
+    desc: |
+      If this option is set, code and output are stored in buffers.
+      See [Typesetting Code](#typesetting-code) for more details.
+  - name: verbose
+    type: boolean
+    desc: |
+      If this option is set, Python input and output is written to the LaTeX log
+      file.
+    examples:
+    - \usepackage[verbose]{pyluatex}
