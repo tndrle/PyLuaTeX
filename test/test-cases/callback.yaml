@@ -1,0 +1,85 @@
+tests:
+- code: |
+    \directlua{
+      pyluatex.register_event_handler(
+        "post_execute",
+        "handler_name",
+        function() texio.write("CALLBACK TEST") end
+      )
+    }
+    \py{1}
+  log: CALLBACK TEST
+  pdf: 1
+- success: false
+  code: |
+    \directlua{
+      pyluatex.register_event_handler(
+        "unknown_event",
+        "handler_name",
+        function() texio.write("CALLBACK TEST") end
+      )
+    }
+  log: |
+    ! Package PyLuaTeX Error: Unknown event "unknown_event".
+- success: false
+  code: |
+    \directlua{
+      pyluatex.register_event_handler(
+        "post_execute",
+        "handler_name",
+        function() texio.write("CALLBACK TEST") end
+      )
+      pyluatex.register_event_handler(
+        "post_execute",
+        "handler_name",
+        function() texio.write("CALLBACK TEST") end
+      )
+    }
+  log: |
+    ! Package PyLuaTeX Error: Event handler "handler_name" already registered for e
+    vent "post_execute".
+- code: |
+    \directlua{
+      pyluatex.register_event_handler(
+        "post_execute",
+        "handler_name",
+        function(info) texio.write("CALLBACK TEST" .. info.code[1]) end
+      )
+    }
+    \py{1}
+    \directlua{
+      pyluatex.unregister_event_handler("post_execute", "handler_name")
+    }
+    \py{2}
+  log: CALLBACK TEST1
+  not_log: CALLBACK TEST2
+  pdf: 1 2
+- success: false
+  code: |
+    \directlua{
+      pyluatex.unregister_event_handler("post_execute", "handler_name")
+    }
+  log: |
+    ! Package PyLuaTeX Error: Event handler "handler_name" not registered for event
+     "post_execute".
+- success: false
+  code: |
+    \directlua{
+      pyluatex.unregister_event_handler("unknown_event", "handler_name")
+    }
+  log: |
+    ! Package PyLuaTeX Error: Unknown event "unknown_event".
+- code: |
+    \directlua{
+      function handler(info)
+        texio.write_nl("TEST")
+        texio.write_nl("Code: " .. table.concat(info.code))
+      end
+
+      pyluatex.register_event_handler("post_execute", "handler_name", handler)
+    }
+    \py{1}
+  log: |
+    TEST
+    Code: 1
+  pdf: 1

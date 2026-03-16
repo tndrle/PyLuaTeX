@@ -1,0 +1,80 @@
+%% Copyright 2021-2024 Tobias Enderle
+%%
+%% This work may be distributed and/or modified under the
+%% conditions of the LaTeX Project Public License, either version 1.3c
+%% of this license or (at your option) any later version.
+%% The latest version of this license is in
+%%   http://www.latex-project.org/lppl.txt
+%% and version 1.3c or later is part of all distributions of LaTeX
+%% version 2005/12/01 or later.
+
+\documentclass{article}
+
+\usepackage{pyluatex}
+
+\title{PyLuaTeX Example -- Change detection using callbacks}
+\author{Tobias Enderle}
+
+\directlua{
+hashes = {}
+
+function hash_handler(info)
+    local text = table.concat(info.code) .. table.concat(info.output)
+    hashes[info.session] = md5.sumhexa((hashes[info.session] or "") .. text)
+end
+
+pyluatex.register_event_handler("post_execute", "hash", hash_handler)
+}
+
+\AtEndDocument{\directlua{
+require("lualibs")  % for JSON
+
+function warn(session, message)
+    tex.sprint('\\PackageWarning{PyLuaTeX}{Session "' .. session .. '" ' .. message .. '}{}')
+    % or write to log directly:
+    % texio.write_nl('Warning: Session "' .. session .. '" ' .. message)
+end
+
+local filename = "\jobname.pyluatex_log"
+local data = io.loaddata(filename)
+if data ~= nil then
+    local old_hashes = utilities.json.tolua(data)
+    local all_sessions = table.unique(
+        table.imerged(table.keys(old_hashes), table.keys(hashes))
+    )
+    for _, s in ipairs(all_sessions) do
+        if old_hashes[s] == nil and hashes[s] ~= nil then
+            warn(s, "added")
+        elseif old_hashes[s] ~= nil and hashes[s] == nil then
+            warn(s, "removed")
+        elseif old_hashes[s] ~= hashes[s] then
+            warn(s, "changed")
+        end
+    end
+end
+io.savedata(filename, utilities.json.tostring(hashes))}
+}
+
+\begin{document}
+
+\maketitle
+
+This example shows a simple implementation for detecting changes in Python code
+and its output on a per-session basis.
+The implementation makes use of a callback provided by PyLuaTeX that is called
+after Python code is executed.
+The callback receives the code, the output and other information about the
+recent Python execution step.
+For each session, an MD5 hash of the session's code and output is computed
+and stored in a file.
+In the next compilation run, the session hashes are compared to the stored ones.
+For each change, a warning is issued.
+
+Try it by compiling once, changing the Python code below, and compiling again.
+
+\py{'Hey there'}
+
+\pysession{test}
+\py{1 + 3}
+
+\end{document}
